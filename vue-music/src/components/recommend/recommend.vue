@@ -1,32 +1,54 @@
 <template>
   <div class="recommend">
-    <div v-if="recommends.length" class="silder-wrapper" ref="silderWrapper">
-      <slider>
-        <div class="" v-for="(item,index) in recommends">
-          <a :href="item.linkUrl">
-            <img :src="item.picUrl" alt="">
-          </a>
+    <scroll ref="scroll" class="recommend-content" :data="discList">
+      <div>
+        <div v-if="recommends.length" class="silder-wrapper" ref="silderWrapper">
+          <slider>
+            <div class="slider-item" v-for="(item,index) in recommends">
+              <a :href="item.linkUrl">
+                <img class="needsclick" @load="loadImg" :src="item.picUrl" alt="">
+              </a>
+            </div>
+          </slider>
         </div>
-      </slider>
-    </div>
-    <div class="recommend-list">
-      <h1 class="list-title">热门歌单推荐</h1>
-    </div>
+        <div class="recommend-list">
+          <h1 class="list-title">热门歌单推荐</h1>
+          <ul>
+            <li class="item" v-for="(item,index) in discList" :key="index">
+              <div class="icon">
+                <img v-lazy="item.imgurl" alt="" width="60" height="60">
+              </div>
+              <div class="text">
+                <h2 class="name" v-html="item.creator.name"></h2>
+                <p class="desc" v-html="item.dissname"></p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="loading-content" v-show="!discList.length">
+        <loading></loading>
+      </div>
+    </scroll>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
   import slider from 'base/slider/slider'
-
+  import Scroll from 'base/scroll/scroll'
+  import Loading from 'base/loading/loading'
   import {getRecommend, getDiscList} from 'api/recommend'
   import {ERR_OK} from 'api/config'
   export default{
     components: {
-      slider
+      slider,
+      Scroll,
+      Loading
     },
     data(){
       return {
-        recommends: []
+        recommends: [],
+        discList: []
       }
     },
     created(){
@@ -45,9 +67,16 @@
       _getDiscList(){
         getDiscList().then((rsp) => {
           if (rsp.code === ERR_OK) {
-            console.log(rsp.data.list)
+            //console.log(rsp.data.list);
+            this.discList = rsp.data.list;
           }
         })
+      },
+      loadImg(){
+        if (!this.checkLoaded) {
+          this.checkLoaded = true;
+          this.$refs.scroll.refresh();
+        }
       }
     }
   }
@@ -60,15 +89,45 @@
     width: 100%
     top: 88px
     bottom: 0
-    .slider-wrapper
-      position: relative
-      width: 100%
+    .recommend-content
+      height: 100%
       overflow: hidden
-    .recommend-list
-      .list-title
-        height: 65px
-        line-height: 65px
-        text-align: center
-        font-size: $font-size-medium
-        color: $color-theme
+      .slider-wrapper
+        position: relative
+        width: 100%
+        overflow: hidden
+      .recommend-list
+        .list-title
+          height: 65px
+          line-height: 65px
+          text-align: center
+          font-size: $font-size-medium
+          color: $color-theme
+        .item
+          display flex
+          box-sizing border-box
+          align-items center
+          padding 0 20px 20px
+          .icon
+            flex 0 0 60px
+            width 60px
+            padding-right 20px
+          .text
+            flex 1
+            display flex
+            justify-content center
+            flex-direction column
+            overflow hidden
+            line-height 20px
+            font-size $font-size-medium
+            .name
+              margin-bottom 10px
+              color $color-text
+            .desc
+              color $color-text-d
+      .loading-content
+        position absolute
+        top 50%
+        width 100%
+        transform translateY(-50%)
 </style>
