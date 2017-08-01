@@ -21,10 +21,16 @@
       <ul>
         <li :class="{'current':currentIndex===index}" class="item" v-for="(item,index) in shorcutlist"
             :data-index="index">{{item}}
-
-
         </li>
       </ul>
+    </div>
+    <div class="list-fixed" v-show="fixedTitle" ref="fixed">
+      <h1 class="fixed-title">
+        {{fixedTitle}}
+      </h1>
+    </div>
+    <div class="loading-container" v-show="!data.length">
+      <loading></loading>
     </div>
   </scroll>
 </template>
@@ -32,17 +38,26 @@
 <script type="text/ecmascript-6">
   import Scroll from 'base/scroll/scroll'
   import {getData} from 'common/js/dom'
-
+  import Loading from 'base/loading/loading'
   const ANCHOR_HEIGHT = 18;
+  const TITLE_HEIGHT = 30;
+
   export default{
     components: {
-      Scroll
+      Scroll,
+      Loading
     },
     computed: {
       shorcutlist(){
         return this.data.map((group) => {
           return group.title.substr(0, 1)
         })
+      },
+      fixedTitle(){
+        if (this.scrollY > 0) {
+          return ""
+        }
+        return this.data[this.currentIndex] ? this.data[this.currentIndex].title : ""
       }
     },
     props: {
@@ -54,7 +69,8 @@
     data(){
       return {
         scrollY: -1,
-        currentIndex: 0
+        currentIndex: 0,
+        diff: 0
       }
     },
     created(){
@@ -126,10 +142,21 @@
           let height2 = listHeight[i + 1];
           if ((-newY >= height1 && -newY < height2)) {
             this.currentIndex = i;
+
+            this.diff = height2 + newY; //计算滚动和当前组的差值
+
             return;
           }
         }
         this.currentIndex = listHeight.length - 2;
+      },
+      diff(newVal){
+        let fixedTop = (newVal > 0 && newVal < TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0;
+        if (this.fixedTop === fixedTop) {
+          return
+        }
+        this.fixedTop = fixedTop;
+        this.$refs.fixed.style.transform = "translate3d(0," + fixedTop + "px,0)"
       }
     }
   }
