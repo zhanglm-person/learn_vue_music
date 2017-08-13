@@ -28,11 +28,7 @@
       _getSingerList(){
         getSingerList().then((rsp) => {
           if (rsp.code === ERR_OK) {
-            //console.log(rsp);
-            //this.singers = rsp.data.list;
             this.singers = this._normallizeSinger(rsp.data.list)
-            //console.log(this.singers)
-            // console.log(this._normallizeSinger(this.singers))
           }
         })
       },
@@ -51,6 +47,7 @@
             }))
           }
           const key = item.Findex;
+          //每一个歌手的Findex是她的首字母大写，如果map中没有当前首字母属性，就添加。有就直接push
           if (!map[key]) {
             map[key] = {
               title: key,
@@ -62,24 +59,24 @@
             name: item.Fsinger_name
           }))
         });
-        //console.log(map);
-        //有序列表，处理map
+
+        //有序列表，处理map，map当前已经是含有所有歌手首字母对象的对象集合
         let hot = [];
         let ret = [];
         for (let key in map) {
           let val = map[key];
           //console.log(val)
-          if (val.title.match(/[a-zA-Z]/)) {
+          if (val.title.match(/[a-zA-Z]/)) {  //如果title是字母的话，推送到ret里面
             ret.push(val);
-          } else if (val.title === HOT_NAME) {
+          } else if (val.title === HOT_NAME) {//热门的单独分开
             hot.push(val);
           }
         }
         ret.sort((a, b) => {
-          return a.title.charCodeAt(0) - b.title.charCodeAt(0)
+          return a.title.charCodeAt(0) - b.title.charCodeAt(0)//对于字母的数组，进行排序，是根据字母的编码值从小到大排序
         });
-
-        return hot.concat(ret);
+        console.log(hot.concat(ret))
+        return hot.concat(ret);//返回热门加上ret字母数组
       }
     }
   }

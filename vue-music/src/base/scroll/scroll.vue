@@ -39,7 +39,7 @@
           probeType: this.probeType,
           click: this.click
         });
-        if (this.listenScroll) {
+        if (this.listenScroll) {//如果需要监听滚动事件，则向父组件响应scroll事件
           let me = this;
           this.scroll.on('scroll', (pos) => {
             me.$emit('scroll', pos);
