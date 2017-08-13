@@ -1,6 +1,9 @@
 <template>
   <div class="singer">
-    <list-view :data="singers"></list-view>
+    <list-view :data="singers" @select="selectSinger"></list-view>
+    <keep-alive>
+      <router-view></router-view>
+    </keep-alive>
   </div>
 </template>
 
@@ -9,6 +12,8 @@
   import {ERR_OK} from 'api/config'
   import Singer from 'common/js/singer'
   import ListView from 'base/listView/listView'
+
+  import {mapMutations} from 'vuex'
 
   const HOT_NAME = "热门";
   const HOT_SINGER_LENGTH = 10;
@@ -25,6 +30,12 @@
       this._getSingerList();
     },
     methods: {
+      selectSinger(singer){
+        this.$router.push({
+          path: `/singer/${singer.id}`
+        })
+        this.setSinger(singer);
+      },
       _getSingerList(){
         getSingerList().then((rsp) => {
           if (rsp.code === ERR_OK) {
@@ -75,9 +86,12 @@
         ret.sort((a, b) => {
           return a.title.charCodeAt(0) - b.title.charCodeAt(0)//对于字母的数组，进行排序，是根据字母的编码值从小到大排序
         });
-        console.log(hot.concat(ret))
+        //console.log(hot.concat(ret))
         return hot.concat(ret);//返回热门加上ret字母数组
-      }
+      },
+      ...mapMutations({
+        setSinger:"SET_SINGER"
+      })
     }
   }
 </script>

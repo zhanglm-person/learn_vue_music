@@ -5,6 +5,8 @@ import Recommend from 'components/recommend/recommend'
 import Rank from 'components/rank/rank'
 import Search from 'components/search/search'
 import Singer from 'components/singer/singer'
+
+import SingerDetial from 'components/singer-detial/singer-detial'
 Vue.use(Router)
 
 export default new Router({
@@ -27,7 +29,13 @@ export default new Router({
     },
     {
       path:"/singer",
-      component:Singer
+      component:Singer,
+      children:[
+        {
+          path:":id",
+          component:SingerDetial
+        }
+      ]
     }
   ]
 })

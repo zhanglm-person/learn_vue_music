@@ -10,7 +10,7 @@
       <li class="list-group" v-for="(group,index) in data" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
         <ul>
-          <li class="list-group-item" v-for="(item,index) in group.items">
+          <li @click="selectItem(item)" class="list-group-item" v-for="(item,index) in group.items">
             <img v-lazy="item.avatar" alt="" class="avatar">
             <span class="name">{{item.name}}</span>
           </li>
@@ -21,6 +21,7 @@
       <ul>
         <li :class="{'current':currentIndex===index}" class="item" v-for="(item,index) in shorcutlist"
             :data-index="index">{{item}}
+
         </li>
       </ul>
     </div>
@@ -83,6 +84,9 @@
       this.probeType = 3;//需要子组件scroll实时记录滚动状态
     },
     methods: {
+      selectItem(item){
+        this.$emit("select",item);
+      },
       onShortcutTouchStart(e){
         //console.log(e.target);
         let anchorIndex = getData(e.target, "index");
