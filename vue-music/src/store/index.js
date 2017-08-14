@@ -6,7 +6,7 @@ import state from './state'
 import mutations from './mutations'
 
 
-import createLoger from 'vuex/dist/logger'
+import createLoger from 'vuex/dist/logger'    //日志插件
 
 Vue.use(Vuex)
 
@@ -18,5 +18,7 @@ export default new Vuex.Store({
   state,
   mutations,
   strict: debug,
-  plugins: debug ? [createLoger()] : []
+  plugins: debug ? [createLoger({
+    collapsed: false  //自动打开日志
+  })] : []
 })

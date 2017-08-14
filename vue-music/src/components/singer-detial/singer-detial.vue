@@ -14,7 +14,7 @@
     methods: {
       getSingerDetial(id){
         getSingerDetial(id).then((rsp) => {
-          console.log(rsp);
+          //console.log(rsp);
         })
       }
     },
