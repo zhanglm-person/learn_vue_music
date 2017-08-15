@@ -32,6 +32,7 @@ export default class Song {
   }
 }
 
+
 export function createSong(musicData) {
   return new Song({
     id: musicData.songid,
@@ -45,7 +46,7 @@ export function createSong(musicData) {
   })
 }
 
-function filterSinger(singer) {
+export function filterSinger(singer) {
   let ret = []
   if (!singer) {
     return ''
