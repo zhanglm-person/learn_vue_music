@@ -24,12 +24,12 @@
     computed: {
       title(){
         //if (this.singer) {
-          return this.singer.name
-        //}
+        return this.singer.name
+        // }
       },
       bgImg(){
         //if (this.singer) {
-          return this.singer.avatar
+        return this.singer.avatar
         //}
       },
       ...mapGetters([
@@ -37,14 +37,23 @@
       ])
     },
     created(){
+      this.singerId = this.singer.id;
+
       this._getDetial();
+       console.log(this.singerId)
+    },
+    watch:{
+      singerId(oldVal,newVal){
+          console.log(newVal)
+        this._getDetial();
+      }
     },
     methods: {
       _getDetial(){
-        if (!this.singer) {           //原码是 !this.singer.id
-          this.$router.push('/singer');
-          return;
+        if (!this.singer.id) {           //原码是 !this.singer.id
+           this.$router.push('/singer');
         }
+        //console.log(this.singer.id)
         getSingerDetial(this.singer.id).then((rsp) => {
           //console.log(rsp)
           if (rsp.code === ERR_OK) {
@@ -82,6 +91,6 @@
   .slider-enter-active, .slider-leave-active
     transition all 0.3s
 
-  .slider-enter, .slider-leave
+  .slider-enter, .slider-leave-active
     transform translate3d(100%, 0, 0)
 </style>

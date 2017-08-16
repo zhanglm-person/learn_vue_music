@@ -1,10 +1,10 @@
 <template>
   <div class="song-list">
     <ul>
-      <li v-for="(song,index) in songs" class="item">
+      <li @click="selectItem(song,index)" v-for="(song,index) in songs" class="item">
         <div class="content">
           <h2 class="name">{{song.name}}</h2>
-          <p class="desc">{{song}}</p>
+          <p class="desc">{{song | getDesc}}</p>
         </div>
       </li>
     </ul>
@@ -19,7 +19,11 @@
         default: []
       }
     },
-    methods: {},
+    methods: {
+      selectItem(item, index){
+        this.$emit("select", item, index)
+      }
+    },
     filters: {
       getDesc(song){
         return `${song.singer}·${song.album}`
@@ -49,12 +53,12 @@
           width: 25px
           height: 24px
           background-size: 25px 24px
-          /*&.icon0
-            bg-image('first')
-          &.icon1
-            bg-image('second')
-          &.icon2
-            bg-image('third')*/
+        /*&.icon0
+          bg-image('first')
+        &.icon1
+          bg-image('second')
+        &.icon2
+          bg-image('third')*/
         .text
           color: $color-theme
           font-size: $font-size-large
