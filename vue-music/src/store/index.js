@@ -18,7 +18,5 @@ export default new Vuex.Store({
   state,
   mutations,
   strict: debug,
-  plugins: debug ? [createLoger({
-    collapsed: false  //自动打开日志
-  })] : []
+  plugins: debug ? [createLoger()] : []
 })

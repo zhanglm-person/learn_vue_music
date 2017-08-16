@@ -9,6 +9,14 @@ import Singer from 'components/singer/singer'
 import SingerDetial from 'components/singer-detial/singer-detial'
 Vue.use(Router)
 
+/*
+const SingerDetial = (resolve) => {
+  import('components/singer-detial/singer-detial').then((module) => {
+    resolve(module)
+  })
+}*/
+
+
 export default new Router({
   routes: [
     {

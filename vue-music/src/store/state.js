@@ -10,4 +10,4 @@ const state = {
   currentIndex: -1
 };
 
-export default {state}
+export default state
