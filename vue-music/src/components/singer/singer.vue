@@ -1,9 +1,8 @@
 <template>
   <div class="singer">
     <list-view :data="singers" @select="selectSinger"></list-view>
-    <keep-alive>
-      <router-view></router-view>
-    </keep-alive>
+    <!--在子组件需要拉去数据来获取内容的时候，一定不要使用keep-alive存入缓存，否则不会拉取数据-->
+    <router-view></router-view>
   </div>
 </template>
 

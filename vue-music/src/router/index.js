@@ -40,7 +40,7 @@ export default new Router({
       component:Singer,
       children:[
         {
-          path:":id",
+          path:":id",           //以ID为变量
           component:SingerDetial
         }
       ]
