@@ -41,14 +41,17 @@
         getSingerDetial(this.singer.id).then((res) => {
           if (res.code === ERR_OK) {
             this.songs = this._normalizeSongs(res.data.list)
+            //console.log(this.songs)
           }
         })
       },
       _normalizeSongs(list) {
         let ret = []
         list.forEach((item) => {
-          let {musicData} = item
+          //let {musicData} = item          es6 对象结构赋值
+          let musicData = item.musicData;
           if (musicData.songid && musicData.albummid) {
+            //根据工厂方法 创建一个song
             ret.push(createSong(musicData))
           }
         })
@@ -59,56 +62,6 @@
       MusicList
     }
   }
-  /*export default{
-    data(){
-      return {
-        song: []
-      }
-    },
-    components: {
-      MusicList
-    },
-    computed: {
-      title(){
-        return this.singer.name
-      },
-      bgImg(){
-        return this.singer.avatar
-      },
-      ...mapGetters([
-        'singer'
-      ])
-    },
-    created() {
-        console.log(12132)
-      this._getDetail()
-    },
-    methods: {
-      _getDetail() {
-        if (!this.singer.id) {
-          this.$router.push('/singer')
-          return
-        }
-        getSingerDetial(this.singer.id).then((res) => {
-          if (res.code === ERR_OK) {
-            this.song = this._normallizeSong(res.data.list)
-          }
-        })
-      },
-      _normallizeSong(list){
-        let ret = [];
-        list.forEach((item) => {
-          //使用ES6：
-          let {musicData} = item;
-          //let musicData = item.musicData
-          if (musicData.songid && musicData.albummid) {
-            ret.push(createSong(musicData))
-          }
-        });
-        return ret;
-      }
-    }
-  }*/
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" scoped>
@@ -116,6 +69,12 @@
   .slider-enter-active, .slider-leave-active
     transition all 0.3s
 
+  /*
+  -leave-active
+  和
+  -leave-to
+  基本效果是一样的
+  */
   .slider-enter, .slider-leave-active
     transform translate3d(100%, 0, 0)
 </style>

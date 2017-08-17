@@ -11,3 +11,6 @@ const state = {
 };
 
 export default state
+/*
+* 导出的state本身就是一个对象，不需要再次加上｛｝!!!!
+* */

@@ -18,7 +18,7 @@
       <div class="song-list-wrapper">
         <song-list @select="select" :songs="songs"></song-list>
       </div>
-      <div class="loading-content" v-show="!songs.length">
+      <div class="loading-content" v-if="!songs.length">
         <loading></loading>
       </div>
     </scroll>
@@ -33,9 +33,9 @@
   import {mapActions} from 'vuex'
 
   const RESERVED_HEIGHT = 40;
+
   const transform = prefixStyle('transform');
   const backdrop = prefixStyle('backdrop-filter');
-
   export default{
     components: {
       Scroll,
@@ -67,12 +67,13 @@
       }
     },
     created(){
-      this.probeType = 3;
-      this.listenScroll = true;
+      this.probeType = 3;       //监听scroll组件的滚动
+      this.listenScroll = true; //监听scroll组件的滚动
     },
     mounted(){
-      this.imgHeight = this.$refs.bgImg.clientHeight;
-      this.minTranslateY = -this.imgHeight + RESERVED_HEIGHT;
+      this.imgHeight = this.$refs.bgImg.clientHeight;   //获取到图片的高度
+      this.minTranslateY = -this.imgHeight + RESERVED_HEIGHT; // 取消掉顶部的固定的高度
+      //this.$refs对应取到的是components对象，需要拿到 $el 取真实的DOM
       this.$refs.list.$el.style.top = this.imgHeight + "px";
     },
     methods: {
@@ -81,6 +82,7 @@
       },
       back(){
         this.$router.back();
+        // 回退 router
       },
       select(item, index){
         this.selectPlay({
@@ -104,7 +106,7 @@
           scale = 1 + percent;
           zIndex = 10;
         } else {
-          blur = Math.min(20 * percent, 20);
+          blur = Math.min(20 * percent, 20); //最大是20
         }
         this.$refs.filter.style[backdrop] = 'blur(' + blur + 'px)';
         if (this.minTranslateY > newY) {

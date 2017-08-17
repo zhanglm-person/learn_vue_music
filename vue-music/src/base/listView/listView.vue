@@ -30,7 +30,7 @@
         {{fixedTitle}}
       </h1>
     </div>
-    <div class="loading-container" v-show="!data.length">
+    <div class="loading-container" v-if="!data.length">
       <loading></loading>
     </div>
   </scroll>

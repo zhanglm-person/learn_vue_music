@@ -3,6 +3,7 @@ import {ERR_OK} from 'api/config'
 import {Base64} from 'js-base64'
 
 export default class Song {
+  // 类 是面向对象编程 扩展性好
   constructor({id, mid, singer, name, album, duration, image, url}) {
     this.id = id
     this.mid = mid
@@ -47,6 +48,7 @@ export function createSong(musicData) {
 }
 
 export function filterSinger(singer) {
+  // 定义一个把数组组合成字符串的方法
   let ret = []
   if (!singer) {
     return ''
