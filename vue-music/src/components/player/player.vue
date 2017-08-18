@@ -1,5 +1,5 @@
 <template>
-  <div class="player" v-if="playlist.length>0">
+  <div class="player" v-show="playlist.length>0">
     <transition name="normal"
                 @enter="enter"
                 @after-enter="afterEnter"
@@ -20,25 +20,32 @@
         <div class="middle">
           <div class="middle-l">
             <div class="cd-wrapper" ref="cdWrapper">
-              <div class="cd">
+              <div class="cd" :class="cdCls">
                 <img class="image" :src="currentSong.image" alt="">
               </div>
             </div>
           </div>
         </div>
         <div class="bottom">
+          <div class="progress-wrapper">
+            <span class="time time-l">{{format(currentTime)}}</span>
+            <div class="progress-bar-wrapper">
+              <progress-bar :percent="percent" @percentChange="onProgessBarChange"></progress-bar>
+            </div>
+            <span class="time time-r">{{format(currentSong.duration)}}</span>
+          </div>
           <div class="operators">
             <div class="icon i-left">
               <i class="icon-sequence"></i>
             </div>
-            <div class="icon i-left">
-              <i class="icon-prev"></i>
+            <div class="icon i-left" :class="disableCls">
+              <i class="icon-prev" @click="prev"></i>
             </div>
-            <div class="icon i-center">
-              <i class="icon-play"></i>
+            <div class="icon i-center" :class="disableCls">
+              <i :class="playIcon" @click="togglePlaying"></i>
             </div>
-            <div class="icon i-right">
-              <i class="icon-next"></i>
+            <div class="icon i-right" :class="disableCls">
+              <i class="icon-next" @click="next"></i>
             </div>
             <div class="icon i-right">
               <i class="icon icon-not-favorite"></i>
@@ -50,36 +57,62 @@
     <transition name="mini">
       <div class="mini-player" v-show="!fullScreen" @click="open">
         <div class="icon">
-          <img :src="currentSong.image" alt="" width="40" height="40">
+          <img :class="cdCls" :src="currentSong.image" alt="" width="40" height="40">
         </div>
         <div class="text">
           <h2 class="name" v-html="currentSong.name"></h2>
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
-        <div class="control"></div>
         <div class="control">
-          <i class="icon-playlist"></i>
+          <i :class="miniIcon" @click.stop.prevent="togglePlaying"></i>
+        </div>
+        <div class="control">
+          <i class="icon-playlist" @click.stop.prevent=""></i>
         </div>
       </div>
     </transition>
+    <audio :src="currentSong.url" ref="audio" @timeupdate="updateTime" @canplay="ready" @error="error"></audio>
   </div>
 </template>
 
 <script type='text/ecmascript-6'>
+  import ProgressBar from 'base/progress-bar/progress-bar'
+
   import {mapGetters, mapMutations} from 'vuex'
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from 'common/js/dom'
 
   const transform = prefixStyle('transform');
   export default{
+    data(){
+      return {
+        songReady: false,  //监听歌曲已经可以play的标志位，来判断是否可以点击 上下切换歌曲
+        currentTime: 0
+      }
+    },
     computed: {
+      percent(){
+        return this.currentTime / this.currentSong.duration
+      },
+      cdCls(){
+        return this.playing ? "play" : "play pause"
+      },
+      playIcon(){
+        return this.playing ? "icon-pause" : "icon-play"
+      },
+      miniIcon(){
+        return this.playing ? "icon-pause-mini" : "icon-play-mini"
+      },
+      disableCls(){
+        return this.songReady ? "" : "disable"
+      },
       ...mapGetters([
         'fullScreen',
         'playlist',
-        'currentSong'
+        'currentSong',
+        'playing',
+        'currentIndex'
       ])
-    },
-    mounted() {
     },
     methods: {
       back(){
@@ -123,7 +156,6 @@
       leave(el, done){
         this.$refs.cdWrapper.style.transition = "all 0.4s";
         const {x, y, scale} = this._getPosAndScale();
-        console.log({x, y, scale});
         // 离开的动画 就是把 当前元素 再次变回到 本不属于自己的位置和大小，实际的位置和大小还是css中设定的
         this.$refs.cdWrapper.style[transform] = `translate3d(${x}px,${y}px,0) scale(${scale})`;
         this.$refs.cdWrapper.addEventListener('transitionend', done);
@@ -132,6 +164,53 @@
         //动画结束要清除 transition 和 transform
         this.$refs.cdWrapper.style.transition = "";
         this.$refs.cdWrapper.style.transform = "";
+      },
+      togglePlaying(){
+        this.setPlaying(!this.playing);
+      },
+      prev(){
+        if (!this.songReady) {
+          return;
+        }
+        let index = this.currentIndex - 1;
+        if (index === -1) {
+          index = this.playlist.length - 1;
+        }
+        this.setCurrentIndex(index);
+        if (!this.playing) {
+          this.togglePlaying();
+        }
+        this.songReady = false;   // 每次进入到歌曲，可以播放的时候，再把标志位切换到false
+      },
+      next(){
+        if (!this.songReady) {
+          return;
+        }
+        let index = this.currentIndex + 1;
+        if (index === this.playlist.length) {
+          index = 0;
+        }
+        this.setCurrentIndex(index);
+        if (!this.playing) {
+          this.togglePlaying();
+        }
+        this.songReady = false; // 每次进入到歌曲，可以播放的时候，再把标志位切换到false
+      },
+      ready(){
+        this.songReady = true;
+      },
+      error(){
+        // 歌曲出现错误，也要可以点击切换
+        this.songReady = true;
+      },
+      updateTime(e){
+        this.currentTime = e.target.currentTime;    //媒体文件的currentTime属性，可读可写
+      },
+      onProgessBarChange(percent){
+        this.$refs.audio.currentTime = this.currentSong.duration * percent;
+        if (!this.playing) {
+          this.togglePlaying();
+        }
       },
       _getPosAndScale(){
         const targetWidth = 40;               //小的播放器的CD宽度
@@ -145,15 +224,49 @@
         const y = window.innerHeight - paddingTop - width / 2 - paddingBottom;//y轴的偏移量
         return {x, y, scale};
       },
+      format(interval){
+        interval = interval | 0;      //向下取整，效果 => Math.floor
+        const minute = interval / 60 | 0;
+        const second = this._pad(interval % 60);
+        return minute + ":" + second;
+      },
+      _pad(num, n = 2){
+        let length = num.toString().length;
+        while (length < n) {
+          num = '0' + num;
+          length++
+        }
+        return num;
+      },
       ...mapMutations({
-          setFullScreen: 'SET_FULLSCREEN'
+          setFullScreen: 'SET_FULLSCREEN',
+          setPlaying: 'SET_PLAYING_STATE',
+          setCurrentIndex: 'SET_CURRENTINDEX'
         }
       )
+    },
+    watch: {
+      currentSong(){
+        // 一般需要获取到Components对象的组件中控制该组件的显示隐藏 一定要使用v-show不要使用v-if否则第一次的时候会报 找不到元素的错误！！！
+        this.$nextTick(() => {
+          this.$refs.audio.play();
+        })
+      },
+      playing(newPlaying){
+        // 一般需要获取到Components对象的组件中控制该组件的显示隐藏 一定要使用v-show不要使用v-if否则第一次的时候会报 找不到元素的错误！！！
+        const audio = this.$refs.audio;
+        this.$nextTick(() => {
+          newPlaying ? audio.play() : audio.pause();
+        })
+      }
+    },
+    components: {
+      ProgressBar
     }
   }
 </script>
 
-<style lang="stylus" rel="stylesheet/stylus">
+<style lang="stylus" rel="stylesheet/stylus" scoped>
   @import "~common/stylus/variable"
   @import "~common/stylus/mixin"
 
@@ -289,7 +402,7 @@
           display: flex
           align-items: center
           width: 80%
-          margin: 0px auto
+          margin: 0 auto
           padding: 10px 0
           .time
             color: $color-text
