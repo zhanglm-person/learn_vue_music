@@ -64,7 +64,9 @@
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
         <div class="control">
-          <i :class="miniIcon" @click.stop.prevent="togglePlaying"></i>
+          <progress-circle :percent="percent" :radius="radius">
+            <i class="icon-mini" :class="miniIcon" @click.stop.prevent="togglePlaying"></i>
+          </progress-circle>
         </div>
         <div class="control">
           <i class="icon-playlist" @click.stop.prevent=""></i>
@@ -77,7 +79,7 @@
 
 <script type='text/ecmascript-6'>
   import ProgressBar from 'base/progress-bar/progress-bar'
-
+  import ProgressCircle from 'base/progress-circle/progress-circle'
   import {mapGetters, mapMutations} from 'vuex'
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from 'common/js/dom'
@@ -87,7 +89,8 @@
     data(){
       return {
         songReady: false,  //监听歌曲已经可以play的标志位，来判断是否可以点击 上下切换歌曲
-        currentTime: 0
+        currentTime: 0,
+        radius: 32
       }
     },
     computed: {
@@ -261,7 +264,8 @@
       }
     },
     components: {
-      ProgressBar
+      ProgressBar,
+      ProgressCircle
     }
   }
 </script>
