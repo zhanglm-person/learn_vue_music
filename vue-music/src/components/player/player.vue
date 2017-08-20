@@ -36,7 +36,7 @@
           </div>
           <div class="operators">
             <div class="icon i-left">
-              <i class="icon-sequence"></i>
+              <i :class="iconMode" @click="changeMode"></i>
             </div>
             <div class="icon i-left" :class="disableCls">
               <i class="icon-prev" @click="prev"></i>
@@ -73,7 +73,8 @@
         </div>
       </div>
     </transition>
-    <audio :src="currentSong.url" ref="audio" @timeupdate="updateTime" @canplay="ready" @error="error"></audio>
+    <audio :src="currentSong.url" ref="audio" @timeupdate="updateTime" @canplay="ready" @error="error"
+           @end="end"></audio>
   </div>
 </template>
 
@@ -83,7 +84,8 @@
   import {mapGetters, mapMutations} from 'vuex'
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from 'common/js/dom'
-
+  import {playMode} from 'common/js/config'
+  import {shuffle} from 'common/js/util'
   const transform = prefixStyle('transform');
   export default{
     data(){
@@ -109,12 +111,17 @@
       disableCls(){
         return this.songReady ? "" : "disable"
       },
+      iconMode(){
+        return this.mode === playMode.sequence ? 'icon-sequence' : this.mode === playMode.loop ? 'icon-loop' : 'icon-random'
+      },
       ...mapGetters([
         'fullScreen',
         'playlist',
         'currentSong',
         'playing',
-        'currentIndex'
+        'currentIndex',
+        'mode',
+        'sequencelist'
       ])
     },
     methods: {
@@ -171,6 +178,28 @@
       togglePlaying(){
         this.setPlaying(!this.playing);
       },
+      changeMode(){
+        // 切换播放模式
+        const mode = (this.mode + 1) % 3;
+        this.setMode(mode);
+        // 当播放模式切换到随机播放的时候，打乱playlist（洗牌函数）
+        let list = null;
+        if (mode === playMode.random) {
+          list = shuffle(this.playlist)
+        } else {
+          list = this.sequencelist;
+        }
+        // 随机播放切换playlist的时候，不能切换当前播放歌曲，所以去新的播放列表找到当前播放歌曲，设置currentIndex
+        this.resetCurrentIndex(list);
+        this.setPlaylist(list);
+      },
+      resetCurrentIndex(list){
+        // findIndex是ES6提供给数组的函数->寻找元素，如果匹配到元素就返回当前元素的index，没有返回-1
+        let index = list.findIndex((item) => {
+          return item.id === this.currentSong.id
+        });
+        this.setCurrentIndex(index);
+      },
       prev(){
         if (!this.songReady) {
           return;
@@ -183,7 +212,7 @@
         if (!this.playing) {
           this.togglePlaying();
         }
-        this.songReady = false;   // 每次进入到歌曲，可以播放的时候，再把标志位切换到false
+        this.songReady = false; //每次进入到歌曲，可以播放的时候，再把标志位切换到false
       },
       next(){
         if (!this.songReady) {
@@ -198,6 +227,17 @@
           this.togglePlaying();
         }
         this.songReady = false; // 每次进入到歌曲，可以播放的时候，再把标志位切换到false
+      },
+      end(){
+        if (this.mode === playMode.loop) {
+          this.loop();
+        } else {
+          this.next();
+        }
+      },
+      loop(){
+        this.$refs.audio.currentTime = 0;
+        this.$refs.audio.play();
       },
       ready(){
         this.songReady = true;
@@ -244,13 +284,19 @@
       ...mapMutations({
           setFullScreen: 'SET_FULLSCREEN',
           setPlaying: 'SET_PLAYING_STATE',
-          setCurrentIndex: 'SET_CURRENTINDEX'
+          setCurrentIndex: 'SET_CURRENTINDEX',
+          setMode: 'SET_MODE',
+          setPlaylist: 'SET_PLAYLIST',
         }
       )
     },
     watch: {
-      currentSong(){
+      currentSong(newSong, oldSong){
         // 一般需要获取到Components对象的组件中控制该组件的显示隐藏 一定要使用v-show不要使用v-if否则第一次的时候会报 找不到元素的错误！！！
+        // 如果currentSong的ID没有变化 就不能执行播放！
+        if (newSong.id === oldSong.id) {
+          return;
+        }
         this.$nextTick(() => {
           this.$refs.audio.play();
         })

@@ -22,12 +22,13 @@
     },
     data() {
       return {
-        dashArray: Math.PI * 100
+        dashArray: Math.PI * 100  // dashArray 表示周长
       }
     },
     computed: {
       dashOffset() {
-        return (1 - this.percent) * this.dashArray
+        // 偏移量满周长的话 是没有显示外层的圆的 就是没有进度！
+        return (1 - this.percent) * this.dashArray  // 当前圆周上的的偏移量
       }
     }
   }

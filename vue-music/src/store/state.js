@@ -4,8 +4,8 @@ const state = {
   singer: {},
   playing: false,
   fullScreen: false,
-  playlist: [],
-  sequencelist: [],
+  playlist: [],   // 当前的播放列表
+  sequencelist: [], // 一开始的顺序播放列表
   mode: playMode.sequence,
   currentIndex: -1
 };

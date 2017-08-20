@@ -30,7 +30,12 @@
     },
     methods: {
       progressClick(e){
-        this._offset(e.offsetX);    // 点击获取offsetX是偏移量
+        // 点击progressBtn e.offsetX 是不正确的
+        // this._offset(e.offsetX);    // 点击获取offsetX是偏移量
+        // getBoundingClientRect 返回一个矩形，可以获取四个方向距离边框的值
+        const left = this.$refs.progressBar.getBoundingClientRect().left;
+        const offsetWidth = e.pageX - left;
+        this._offset(offsetWidth);
         this._triggerPercent();     // 然后 向 父组件 通知改变
       },
       progressTouchStart(e){
