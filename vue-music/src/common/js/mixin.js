@@ -8,10 +8,10 @@ export const playlistMixin = {
       'playlist'
     ])
   },
-  mounted() {
+  mounted() {                          // 一般组件的created之后触发
     this.handlePlaylist(this.playlist)
   },
-  activated() {
+  activated() {                       // keep-alive组件且回来触发的hook
     this.handlePlaylist(this.playlist)
   },
   watch: {
@@ -20,11 +20,11 @@ export const playlistMixin = {
     }
   },
   methods: {
-    handlePlaylist() {
+    handlePlaylist() {                // 组件中要再次声明handlePlaylist函数，否则调用当前函数报错
       throw new Error('component must implement handlePlaylist method')
     }
   }
-}
+};
 
 export const playerMixin = {
   computed: {

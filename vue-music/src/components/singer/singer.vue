@@ -1,6 +1,6 @@
 <template>
-  <div class="singer">
-    <list-view :data="singers" @select="selectSinger"></list-view>
+  <div class="singer" ref="singer">
+    <list-view ref="listview" :data="singers" @select="selectSinger"></list-view>
     <!--在子组件需要拉去数据来获取内容的时候，一定不要使用keep-alive存入缓存，否则不会拉取数据-->
     <router-view></router-view>
   </div>
@@ -11,12 +11,14 @@
   import {ERR_OK} from 'api/config'
   import Singer from 'common/js/singer'
   import ListView from 'base/listView/listView'
+  import {playlistMixin} from 'common/js/mixin'
 
   import {mapMutations} from 'vuex'
 
   const HOT_NAME = "热门";
   const HOT_SINGER_LENGTH = 10;
   export default{
+    mixins:[playlistMixin],
     components: {
       ListView
     },
@@ -29,6 +31,11 @@
       this._getSingerList();
     },
     methods: {
+      handlePlaylist(playlist){
+        const bottom = playlist.length > 0 ? '60px' :'';
+        this.$refs.singer.style.bottom = bottom;
+        this.$refs.listview.refresh();
+      },
       selectSinger(singer){
         this.$router.push({
           path: `/singer/${singer.id}`

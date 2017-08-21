@@ -84,6 +84,9 @@
       this.probeType = 3;//需要子组件scroll实时记录滚动状态
     },
     methods: {
+      refresh(){
+        this.$refs.listview.refresh();
+      },
       selectItem(item){
         this.$emit("select",item);
       },

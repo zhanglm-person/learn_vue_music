@@ -10,8 +10,8 @@ export function getLyric(mid) {
     hostUin: 0,
     needNewCode: 0,
     categoryId: 10000000,
-    pcachetime: +new Date(),
-    format: 'json'
+    pcachetime: +new Date(),  // 时间戳
+    format: 'json'          // 不需要jsonp请求,换成json
   })
 
   return axios.get(url, {

@@ -14,8 +14,9 @@ export default class Song {
     this.image = image
     this.url = url
   }
-
+  // 获取歌词，当作歌曲类的一个属性
   getLyric() {
+    // 如果当前歌曲已经有 lyric ，就直接返回一个 Promise
     if (this.lyric) {
       return Promise.resolve(this.lyric)
     }
@@ -23,7 +24,7 @@ export default class Song {
     return new Promise((resolve, reject) => {
       getLyric(this.mid).then((res) => {
         if (res.retcode === ERR_OK) {
-          this.lyric = Base64.decode(res.lyric)
+          this.lyric = Base64.decode(res.lyric);
           resolve(this.lyric)
         } else {
           reject('no lyric')
