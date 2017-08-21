@@ -112,6 +112,7 @@
         this.scrollY = pos.y;
       },
       _calculateHeight(){
+        // 计算当前列表，每个字母组合的距离顶部的高低，拼成数组
         this.listHeight = [];
         const list = this.$refs.listGroup;
         let height = 0;

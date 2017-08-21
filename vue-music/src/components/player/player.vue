@@ -176,6 +176,7 @@
         this.$refs.cdWrapper.style.transform = "";
       },
       togglePlaying(){
+        // 切换播放和暂停
         this.setPlaying(!this.playing);
       },
       changeMode(){
@@ -229,6 +230,7 @@
         this.songReady = false; // 每次进入到歌曲，可以播放的时候，再把标志位切换到false
       },
       end(){
+        // 结束的时候，判断是否是单曲循环。
         if (this.mode === playMode.loop) {
           this.loop();
         } else {
@@ -236,10 +238,12 @@
         }
       },
       loop(){
+        // 单曲循环的时候，把当前歌曲播放的当前时间设为开始。再设置播放
         this.$refs.audio.currentTime = 0;
         this.$refs.audio.play();
       },
       ready(){
+        // 当前歌曲可以播放，也可以切换歌曲的状态
         this.songReady = true;
       },
       error(){
@@ -247,10 +251,13 @@
         this.songReady = true;
       },
       updateTime(e){
+        // 监听媒体文件的currentTime，赋值给data中的currentTime，做vue的监听
         this.currentTime = e.target.currentTime;    //媒体文件的currentTime属性，可读可写
       },
       onProgessBarChange(percent){
+        // 当子组件的滚动条被改变的时候，根据返回的percent百分比，设置当前歌曲的播放位置
         this.$refs.audio.currentTime = this.currentSong.duration * percent;
+        // 改变进度条之后，如果是暂停状态，就要切换播放状态，让其播放
         if (!this.playing) {
           this.togglePlaying();
         }
@@ -268,12 +275,14 @@
         return {x, y, scale};
       },
       format(interval){
+        // 对当前播放时间和总时长做格式化调整
         interval = interval | 0;      //向下取整，效果 => Math.floor
         const minute = interval / 60 | 0;
         const second = this._pad(interval % 60);
         return minute + ":" + second;
       },
       _pad(num, n = 2){
+        // 补零函数
         let length = num.toString().length;
         while (length < n) {
           num = '0' + num;
@@ -293,18 +302,21 @@
     watch: {
       currentSong(newSong, oldSong){
         // 一般需要获取到Components对象的组件中控制该组件的显示隐藏 一定要使用v-show不要使用v-if否则第一次的时候会报 找不到元素的错误！！！
-        // 如果currentSong的ID没有变化 就不能执行播放！
+        // 如果currentSong的ID没有变化 就不能再次执行播放！
         if (newSong.id === oldSong.id) {
           return;
         }
+        // 切换歌曲之后要进行播放
         this.$nextTick(() => {
           this.$refs.audio.play();
         })
       },
       playing(newPlaying){
+        // 此处的playing应该是从state那边读取出来的，上面切换了playing会提交到state更改，之后再获取，就发生了改变
         // 一般需要获取到Components对象的组件中控制该组件的显示隐藏 一定要使用v-show不要使用v-if否则第一次的时候会报 找不到元素的错误！！！
         const audio = this.$refs.audio;
         this.$nextTick(() => {
+          // 根据新的playing状态，确定暂停或者播放
           newPlaying ? audio.play() : audio.pause();
         })
       }

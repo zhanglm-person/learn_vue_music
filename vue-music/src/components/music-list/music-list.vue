@@ -68,7 +68,7 @@
       }
     },
     created(){
-      this.probeType = 3;       //监听scroll组件的滚动
+      this.probeType = 3;       //监听scroll组件的滚动,并且返回位置
       this.listenScroll = true; //监听scroll组件的滚动
     },
     mounted(){

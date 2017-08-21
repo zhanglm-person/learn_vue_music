@@ -89,7 +89,7 @@
         return hot.concat(ret);//返回热门加上ret字母数组
       },
       ...mapMutations({
-        setSinger:"SET_SINGER"
+        setSinger: "SET_SINGER"
       })
     }
   }
