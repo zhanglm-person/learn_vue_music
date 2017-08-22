@@ -38,7 +38,7 @@
   const transform = prefixStyle('transform');
   const backdrop = prefixStyle('backdrop-filter');
   export default{
-    mixins:[playlistMixin],
+    mixins: [playlistMixin],
     components: {
       Scroll,
       SongList,
@@ -80,8 +80,9 @@
     },
     methods: {
       handlePlaylist(playlist){
-        const bottom = playlist.length > 0 ? '60px' :'';
-        this.$refs.list.$el.style.bottom = bottom;
+        // 这里的playlist是mixin里面带出来的
+        const bottom = playlist.length > 0 ? '60px' : '';
+        this.$refs.list.$el.style.bottom = bottom;  // 改变scroll组件的视口高度然后刷新scroll
         this.$refs.list.refresh();
       },
       scroll(pos){
@@ -93,7 +94,7 @@
       },
       select(item, index){
         //设置playlist 和 sequencelist ...
-        //传入的item不用，是因为 song-list组件只能提供当前的元素以及索引，但是列表是父组件的songs。子组件不关心外部事件，至尽可能做自己所做的
+        //传入的item不用，是因为 song-list组件只能提供当前的元素以及索引，但是列表是父组件的songs。子组件不关心外部事件，尽可能做自己所做的
         this.selectPlay({
           list: this.songs,
           index
@@ -117,6 +118,7 @@
         let blur = 0;
         this.$refs.bgLayer.style[transform] = 'translate3d(0,' + translateY + 'px,0)';
         const percent = Math.abs(newY / this.imgHeight);
+        // 滚动距离和图片高度做百分比计算
         if (newY > 0) {
           scale = 1 + percent;
           zIndex = 10;
@@ -124,17 +126,18 @@
           blur = Math.min(20 * percent, 20); //最大是20
         }
         this.$refs.filter.style[backdrop] = 'blur(' + blur + 'px)';
-        if (this.minTranslateY > newY) {
+        if (this.minTranslateY > newY) {  //判断已经滚动到顶部了，要增大bgImg的层级，减少高度（paddingTop撑起来的），隐藏随机播放全部按钮
           zIndex = 10;
           this.$refs.bgImg.style.paddingTop = 0;
           this.$refs.bgImg.style.height = RESERVED_HEIGHT + "px";
           this.$refs.playBtn.style.display = "none";
-        } else {
+        } else {  // 判断已经滚动到顶部下边了，不再改变bgImg层级，还原利用paddingTop撑起的高度，展示随机播放全部按钮
           this.$refs.bgImg.style.paddingTop = "70%";
           this.$refs.bgImg.style.height = "0px";
           this.$refs.playBtn.style.display = "";
         }
         this.$refs.bgImg.style.zIndex = zIndex;
+        // 如果下拉过大，则放大bgImg展示效果
         this.$refs.bgImg.style[transform] = 'scale(' + scale + ')';
       }
     }

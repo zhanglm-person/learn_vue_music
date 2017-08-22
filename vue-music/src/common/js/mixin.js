@@ -8,6 +8,7 @@ export const playlistMixin = {
       'playlist'
     ])
   },
+  // 在组件中使用带有playlist参数的handlePlaylist方法，就能取到这里的playlist，就像是Jsonp一样
   mounted() {                          // 一般组件的created之后触发
     this.handlePlaylist(this.playlist)
   },

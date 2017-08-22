@@ -447,7 +447,7 @@
         setPlaying: 'SET_PLAYING_STATE',
         setCurrentIndex: 'SET_CURRENTINDEX',
         setMode: 'SET_MODE',
-        setPlaylist: 'SET_PLAYLIST',
+        setPlaylist: 'SET_PLAYLIST'
       })
     },
     watch: {
@@ -462,14 +462,14 @@
         }
         if (this.currentLyric) { // 切换歌曲的时候，判断是否已经存在一个歌词对象了，如果有就停止当前的歌词播放，在进行下一个歌词的获取和创建
           this.currentLyric.stop();   // 上一个歌词停止的时候，部分参数要归零！！，不然会跳歌词
-          this.currentTime = 0
-          this.playingLyric = ''
+          this.currentTime = 0;
+          this.playingLyric = '';
           this.currentLineNum = 0
         }
         // 切换歌曲之后要进行播放
         // 微信浏览器切换到后台之后是不会执行JS的！！！
         // 为了解决微信浏览器切换后台，执行无法监听到end事件从而无法执行下一步操作进而设置songReady，所以改用setTimeout;
-        clearTimeout(this.timer)
+        clearTimeout(this.timer);
         this.timer = setTimeout(() => {
           this.$refs.audio.play();
           this._getLyric();
