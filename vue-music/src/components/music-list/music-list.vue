@@ -72,6 +72,7 @@
       this.probeType = 3;       //监听scroll组件的滚动,并且返回位置
       this.listenScroll = true; //监听scroll组件的滚动
     },
+
     mounted(){
       this.imgHeight = this.$refs.bgImg.clientHeight;   //获取到图片的高度
       this.minTranslateY = -this.imgHeight + RESERVED_HEIGHT; // 取消掉顶部的固定的高度
@@ -146,6 +147,7 @@
 
 <style lang="stylus" rel="stylesheet/stylus">
   @import "~common/stylus/variable"
+  @import "~common/stylus/mixin"
   .music-list
     position fixed
     z-index 100

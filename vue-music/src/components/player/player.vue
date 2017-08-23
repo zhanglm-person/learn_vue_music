@@ -96,7 +96,7 @@
       </div>
     </transition>
     <audio :src="currentSong.url" ref="audio" @timeupdate="updateTime" @canplay="ready" @error="error"
-           @end="end"></audio>
+           @ended="end"></audio>
   </div>
 </template>
 
@@ -464,7 +464,7 @@
           this.currentLyric.stop();   // 上一个歌词停止的时候，部分参数要归零！！，不然会跳歌词
           this.currentTime = 0;
           this.playingLyric = '';
-          this.currentLineNum = 0
+          this.currentLineNum = 0;
         }
         // 切换歌曲之后要进行播放
         // 微信浏览器切换到后台之后是不会执行JS的！！！

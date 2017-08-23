@@ -7,41 +7,46 @@ import Search from 'components/search/search'
 import Singer from 'components/singer/singer'
 
 import SingerDetial from 'components/singer-detial/singer-detial'
+import Disc from 'components/disc/disc'
 Vue.use(Router)
 
 /*
-const SingerDetial = (resolve) => {
-  import('components/singer-detial/singer-detial').then((module) => {
-    resolve(module)
-  })
-}*/
+ const SingerDetial = (resolve) => {
+ import('components/singer-detial/singer-detial').then((module) => {
+ resolve(module)
+ })
+ }*/
 
 
 export default new Router({
   routes: [
     {
-      path:"/",
-      redirect:"/recommend"
+      path: "/",
+      redirect: "/recommend"
     },
     {
-      path:"/recommend",
-      component:Recommend
+      path: "/recommend",
+      component: Recommend,
+      children: [{
+        path: ":id",
+        component: Disc
+      }]
     },
     {
-      path:"/rank",
-      component:Rank
+      path: "/rank",
+      component: Rank
     },
     {
-      path:"/search",
-      component:Search
+      path: "/search",
+      component: Search
     },
     {
-      path:"/singer",
-      component:Singer,
-      children:[
+      path: "/singer",
+      component: Singer,
+      children: [
         {
-          path:":id",           //以ID为变量
-          component:SingerDetial
+          path: ":id",           //以ID为变量
+          component: SingerDetial
         }
       ]
     }
