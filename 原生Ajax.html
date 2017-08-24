@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script>
+    function createXMLHTTPRequest() {
+        //1.创建XMLHttpRequest对象
+        //需要针对IE和其他类型的浏览器建立这个对象的不同方式写不同的代码
+        var xmlHttpRequest;
+        if (window.XMLHttpRequest) {
+            //针对FireFox，Mozillar，Opera，Safari，IE高版本
+            xmlHttpRequest = new XMLHttpRequest();
+        } else if (window.ActiveXObject) {
+            //针对IE低版本
+            xmlHttpRequest = new ActiveXObject(Microsoft.XMLHTTP);
+        }
+        return xmlHttpRequest;
+    }
+    function get(){
+        var req = createXMLHTTPRequest();
+        if(req){
+            req.open("GET", '后台给的url接口（字符串）', true); // true代表的是异步，false是同步
+            // 上面的url接口后面可以加上参数，例如： www.baidu.com?name=myname&age=age
+            req.onreadystatechange = function(){
+                if(req.readyState === 4){
+                    if(req.status === 200){
+                        alert("success");
+                        // 在这里可以获取到xhr.responseText
+                    }else{
+                        alert("error");
+                    }
+                }
+            };
+            req.send(null);
+        }
+    }
+    function post(){
+        var req = createXMLHTTPRequest();
+        if(req){
+            req.open("POST", '后台给的url接口（字符串）', true);// 这里的接口就是接口，但是也可以加上后端可以get的参数
+            req.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=utf8;");
+            req.send("这里的是post的参数");// 参数的模版是：name=myname&age=age.... （参数中间一定要用&符号隔开）
+            req.onreadystatechange = function(){
+                if(req.readyState === 4){
+                    if(req.status === 200){
+                        alert("success");
+                        // 在这里可以获取到xhr.responseText
+                    }else{
+                        alert("error");
+                    }
+                }
+            }
+        }
+    }
+</script>
+</html>

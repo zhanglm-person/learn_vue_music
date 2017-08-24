@@ -24,8 +24,6 @@
         },
         success: function (rsp) {   //请求成功的时候的回调函数，参数是后端返回的数据，前端对这个数据进行操作。当然如果返回的数据不是json格式的，需要前端转换var rsp = JSON.parse(rsp)。如果是json就可以直接使用。  是不是json 可以输出看一下或者问后端。
             console.log(rsp);
-           // window.open('http://www.baidu.com?id='+123+"&name="+'name')
-           // window.open(`http://www.baidu.com?id=${123}&name=${'myname'}`)
         },
         error: function (e) {   //请求出现问题的回调函数，会在控制台输出错误信息。4开头的是前端出错。5开头的是后端出错（或者是前端传值出错），5开头的问下后端
             console.log(e);
