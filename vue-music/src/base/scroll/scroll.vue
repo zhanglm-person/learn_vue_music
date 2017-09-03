@@ -6,7 +6,8 @@
 
 <script type="text/ecmascript-6">
   import BScroll from 'better-scroll'
-  export default{
+
+  export default {
     props: {
       probeType: {
         type: Number,
@@ -23,6 +24,14 @@
       listenScroll: {
         type: Boolean,
         default: false
+      },
+      pullup: {
+        type: Boolean,
+        default: false
+      },
+      beforeScroll: {
+        type: Boolean,
+        default: false
       }
     },
     mounted() {
@@ -31,7 +40,7 @@
       }, 20)
     },
     methods: {
-      _initScroll(){
+      _initScroll() {
         if (!this.$refs.wrapper) {
           return;
         }
@@ -45,6 +54,18 @@
             me.$emit('scroll', pos);
           })
         }
+        if (this.pullup) {
+          this.scroll.on('scrollEnd', () => {
+            if (this.scroll.y <= this.scroll.maxScrollY + 50) {
+              this.$emit('scrollToEnd')
+            }
+          })
+        }
+        if (this.beforeScroll) {
+          this.scroll.on('beforeScrollStart', () => {
+            this.$emit('beforeScroll');
+          })
+        }
       },
       disable() {
         this.scroll && this.scroll.disable()
@@ -55,10 +76,10 @@
       refresh() {
         this.scroll && this.scroll.refresh()
       },
-      scrollTo(){
+      scrollTo() {
         this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
       },
-      scrollToElement(){
+      scrollToElement() {
         this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)
       }
     },
@@ -66,7 +87,7 @@
       data() {
         setTimeout(() => {
           this.refresh();
-        }, this.refreshDelay)
+        }, 20)
       }
     }
   }

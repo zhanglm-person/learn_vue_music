@@ -1,34 +1,161 @@
 <template>
-  <div class="suggest">
+  <scroll class="suggest"
+          :pullup="pullup"
+          :data="result"
+          @scrollToEnd="searchMore"
+          :beforeScroll="beforeScroll"
+          @beforeScroll="listScroll"
+          ref="suggest"
+  >
     <ul class="suggest-list">
-      <li class="suggert-item">
+      <li class="suggest-item" v-for="(item,index) in result" @click="selectItem(item)">
         <div class="icon">
-          <i></i>
+          <i :class="getIconCls(item)"></i>
         </div>
         <div class="name">
-          <p class="text"></p>
+          <p class="text" v-html="getDisplayName(item)"></p>
         </div>
       </li>
+      <loading title="" v-show="hasMore"></loading>
     </ul>
-  </div>
+    <div class="no-result-wrapper" v-show="!hasMore&&!result.length">
+      <no-result title="抱歉，没有结果"></no-result>
+    </div>
+  </scroll>
 </template>
 
 <script type="text/ecmascript-6">
+  import Scroll from 'base/scroll/scroll'
+  import Loading from 'base/loading/loading'
+  import NoResult from 'base/no-result/no-result'
+  import {search} from 'api/search'
+  import {ERR_OK} from 'api/config'
+  import {createSong} from 'common/js/song'
+  import Singer from 'common/js/singer'
+  import {mapMutations, mapActions} from 'vuex'
+
+  const TYPE_SINGER = 'singer';
+  const PER_PAGE = 20;
   export default {
+    components: {
+      Scroll,
+      Loading,
+      NoResult
+    },
     props: {
       query: {
         type: String,
         default: ""
+      },
+      showSinger: {
+        type: Boolean,
+        default: true
+      }
+    },
+    data() {
+      return {
+        page: 1,
+        result: [],
+        pullup: true,
+        hasMore: true,
+        beforeScroll: true
       }
     },
     methods: {
-      search() {
-
+      listScroll() {
+        this.$emit('listScroll')
       },
+      _search() {
+        // 检索词更改的时候 要重置部分样式控制参数
+        this.page = 1;
+        this.hasMore = true;
+        this.$refs.suggest.scrollTo(0, 0);
+        search(this.query, this.page, this.showSinger, PER_PAGE).then((rsp) => {
+          if (rsp.code === ERR_OK) {
+            this.result = this._genResult(rsp.data);
+            this._checkMore(rsp.data);
+          }
+        })
+      },
+      searchMore() {
+        if (!this.hasMore) {
+          return;
+        }
+        this.page++;
+        search(this.query, this.page, this.showSinger, PER_PAGE).then((rsp) => {
+          if (rsp.code === ERR_OK) {
+            this.result = this.result.concat(this._genResult(rsp.data));
+            this._checkMore(rsp.data);
+          }
+        })
+      },
+      selectItem(item) {
+        if (item.type === TYPE_SINGER) {
+          const singer = new Singer({
+            id: item.singermid,
+            name: item.singername
+          });
+          this.$router.push({
+            path: "/search/" + singer.id
+          });
+          this.setSinger(singer);
+        } else {
+          this.insertSong(item);
+        }
+        this.$emit('select')
+      },
+      getIconCls(item) {
+        if (item.type === TYPE_SINGER) {
+          return 'icon-mine'
+        } else {
+          return 'icon-music'
+        }
+      },
+      getDisplayName(item) {
+        if (item.type === TYPE_SINGER) {
+          return item.singername
+        } else {
+          return item.name + '-' + item.singer
+        }
+      },
+      refresh() {
+        this.$refs.suggest.refresh();
+      },
+      _checkMore(data) {
+        const song = data.song;
+        if (!song.list.length || (song.curnum + song.curpage * PER_PAGE) >= song.totalnum) {
+          this.hasMore = false;
+        }
+      },
+      _genResult(data) {
+        let ret = [];
+        if (data.zhida && data.zhida.singerid) {
+          ret.push({...data.zhida, ...{type: TYPE_SINGER}})
+        }
+        if (data.song) {
+          ret = ret.concat(this._normalizeSongs(data.song.list));
+        }
+        return ret;
+      },
+      _normalizeSongs(list) {
+        let ret = [];
+        list.forEach((musicData) => {
+          if (musicData.songid && musicData.albumid) {
+            ret.push(createSong(musicData));
+          }
+        });
+        return ret;
+      },
+      ...mapMutations({
+        setSinger: "SET_SINGER"
+      }),
+      ...mapActions([
+        'insertSong'
+      ])
     },
-    wacth: {
+    watch: {
       query(newQuery) {
-        this.search()
+        this._search()
       }
     }
   }
@@ -37,7 +164,6 @@
 <style lang="stylus" rel="stylesheet/stylus" scoped>
   @import "~common/stylus/variable"
   @import "~common/stylus/mixin"
-
   .suggest
     height: 100%
     overflow: hidden

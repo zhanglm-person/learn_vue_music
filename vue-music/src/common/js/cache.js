@@ -1,3 +1,4 @@
+// 操作本地存储的相关
 import storage from 'good-storage'
 
 const SEARCH_KEY = '__search__'
@@ -10,7 +11,7 @@ const FAVORITE_KEY = '__favorite__'
 const FAVORITE_MAX_LEN = 200
 
 function insertArray(arr, val, compare, maxLen) {
-  const index = arr.findIndex(compare)
+  const index = arr.findIndex(compare)  // findIndex 传入的是一个函数，参数是每一个数组的元素
   if (index === 0) {
     return
   }
@@ -52,7 +53,7 @@ export function clearSearch() {
   storage.remove(SEARCH_KEY)
   return []
 }
-
+// 默认的state的searchHistory
 export function loadSearch() {
   return storage.get(SEARCH_KEY, [])
 }

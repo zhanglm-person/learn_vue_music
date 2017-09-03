@@ -46,7 +46,13 @@ export default new Router({
     },
     {
       path: "/search",
-      component: Search
+      component: Search,
+      children: [
+        {
+          path: ":id",           //以ID为变量
+          component: SingerDetial
+        }
+      ]
     },
     {
       path: "/singer",
