@@ -32,6 +32,7 @@
     <div ref="searchResult" class="search-result" v-show="query">
       <suggest ref="suggest" :query="query" @listScroll="blurInput" @select="saveSearch"></suggest>
     </div>
+
     <confirm ref="confirm" text="确定要删除所有搜索历史？"
              @confirm="clearSearchHistory"
     ></confirm>

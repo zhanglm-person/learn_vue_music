@@ -91,16 +91,18 @@
           </progress-circle>
         </div>
         <div class="control">
-          <i class="icon-playlist" @click.stop.prevent=""></i>
+          <i class="icon-playlist" @click.stop="showPlaylist"></i>
         </div>
       </div>
     </transition>
+    <play-list ref="playlist"></play-list>
     <audio :src="currentSong.url" ref="audio" @timeupdate="updateTime" @canplay="ready" @error="error"
            @ended="end"></audio>
   </div>
 </template>
 
 <script type='text/ecmascript-6'>
+  import PlayList from 'components/playlist/playlist'
   import ProgressBar from 'base/progress-bar/progress-bar'
   import ProgressCircle from 'base/progress-circle/progress-circle'
   import Scroll from 'base/scroll/scroll'
@@ -110,12 +112,13 @@
   import {playMode} from 'common/js/config'
   import {shuffle} from 'common/js/util'
   import Lyric from 'lyric-parser'
-
+  import {playerMixin} from 'common/js/mixin'
 
   const transform = prefixStyle('transform');
   const transitionDuration = prefixStyle('transitionDuration');
-  export default{
-    data(){
+  export default {
+    mixins: [playerMixin],
+    data() {
       return {
         songReady: false,  //监听歌曲已经可以play的标志位，来判断是否可以点击 上下切换歌曲
         currentTime: 0,
@@ -127,46 +130,50 @@
       }
     },
     computed: {
-      percent(){
+      percent() {
         return this.currentTime / this.currentSong.duration
       },
-      cdCls(){
+      cdCls() {
         return this.playing ? "play" : "play pause"
       },
-      playIcon(){
+      playIcon() {
         return this.playing ? "icon-pause" : "icon-play"
       },
-      miniIcon(){
+      miniIcon() {
         return this.playing ? "icon-pause-mini" : "icon-play-mini"
       },
-      disableCls(){
+      disableCls() {
         return this.songReady ? "" : "disable"
       },
-      iconMode(){
+      /*iconMode() {
         return this.mode === playMode.sequence ? 'icon-sequence' : this.mode === playMode.loop ? 'icon-loop' : 'icon-random'
-      },
+      },*/
       ...mapGetters([
         'fullScreen',
-        'playlist',
-        'currentSong',
-        'playing',
         'currentIndex',
-        'mode',
-        'sequencelist'
+        'playing',
+        /*'playlist',
+          'currentSong',
+          'mode',
+          'sequencelist'*/
       ])
     },
-    created(){
+    created() {
+      // 组件中共享的数据对象
       this.touch = {};
     },
     methods: {
-      back(){
+      showPlaylist() {
+        this.$refs.playlist.show();
+      },
+      back() {
         // 修改vuex的值，一定要要提交mutations
         this.setFullScreen(false);
       },
-      open(){
+      open() {
         this.setFullScreen(true);
       },
-      enter(el, done){          //元素，回调（回调执行之后才能进入下一个钩子函数）
+      enter(el, done) {          //元素，回调（回调执行之后才能进入下一个钩子函数）
         const {x, y, scale} = this._getPosAndScale();
         // 定义 动画过程 (这个动画其实就是一个原本的元素，从一个不是自己的位置和大小，变化到属于自己的位置和大小的过程) translate3d 就是相对于自己本来的属性来说的
         let animation = {
@@ -192,24 +199,24 @@
         // 开始运行动画 参数是  动画的载体、动画的名称、以及回调函数
         animations.runAnimation(this.$refs.cdWrapper, 'move', done);
       },
-      afterEnter(){
+      afterEnter() {
         animations.unregisterAnimation('move');
         //动画结束要清除 animation
         this.$refs.cdWrapper.style.animation = "";
       },
-      leave(el, done){
+      leave(el, done) {
         this.$refs.cdWrapper.style.transition = "all 0.4s";
         const {x, y, scale} = this._getPosAndScale();
         // 离开的动画 就是把 当前元素 再次变回到 本不属于自己的位置和大小，实际的位置和大小还是css中设定的
         this.$refs.cdWrapper.style[transform] = `translate3d(${x}px,${y}px,0) scale(${scale})`;
         this.$refs.cdWrapper.addEventListener('transitionend', done);
       },
-      afterLeave(){
+      afterLeave() {
         //动画结束要清除 transition 和 transform
         this.$refs.cdWrapper.style.transition = "";
         this.$refs.cdWrapper.style.transform = "";
       },
-      togglePlaying(){
+      togglePlaying() {
         if (!this.songReady) {
           return;
         }
@@ -220,29 +227,29 @@
           this.currentLyric.togglePlay();
         }
       },
-      changeMode(){
-        // 切换播放模式
-        const mode = (this.mode + 1) % 3;
-        this.setMode(mode);
-        // 当播放模式切换到随机播放的时候，打乱playlist（洗牌函数）
-        let list = null;
-        if (mode === playMode.random) {
-          list = shuffle(this.playlist)
-        } else {
-          list = this.sequencelist;
-        }
-        // 随机播放切换playlist的时候，不能切换当前播放歌曲，所以去新的播放列表找到当前播放歌曲，设置currentIndex
-        this.resetCurrentIndex(list);
-        this.setPlaylist(list);
-      },
-      resetCurrentIndex(list){
-        // findIndex是ES6提供给数组的函数->寻找元素，如果匹配到元素就返回当前元素的index，没有返回-1
-        let index = list.findIndex((item) => {
-          return item.id === this.currentSong.id
-        });
-        this.setCurrentIndex(index);
-      },
-      prev(){
+      /*      changeMode() {
+              // 切换播放模式
+              const mode = (this.mode + 1) % 3;
+              this.setMode(mode);
+              // 当播放模式切换到随机播放的时候，打乱playlist（洗牌函数）
+              let list = null;
+              if (mode === playMode.random) {
+                list = shuffle(this.playlist)
+              } else {
+                list = this.sequencelist;
+              }
+              // 随机播放切换playlist的时候，不能切换当前播放歌曲，所以去新的播放列表找到当前播放歌曲，设置currentIndex
+              this.resetCurrentIndex(list);
+              this.setPlaylist(list);
+            },
+            resetCurrentIndex(list) {
+              // findIndex是ES6提供给数组的函数->寻找元素，如果匹配到元素就返回当前元素的index，没有返回-1
+              let index = list.findIndex((item) => {
+                return item.id === this.currentSong.id
+              });
+              this.setCurrentIndex(index);
+            },*/
+      prev() {
         if (!this.songReady) {
           return;
         }
@@ -261,7 +268,7 @@
         }
         this.songReady = false; //每次进入到歌曲，可以播放的时候，再把标志位切换到false
       },
-      next(){
+      next() {
         if (!this.songReady) {
           return;
         }
@@ -280,7 +287,7 @@
         }
         this.songReady = false; // 每次进入到歌曲，可以播放的时候，再把标志位切换到false
       },
-      end(){
+      end() {
         // 结束的时候，判断是否是单曲循环。
         if (this.mode === playMode.loop) {
           this.loop();
@@ -288,7 +295,7 @@
           this.next();
         }
       },
-      loop(){
+      loop() {
         // 单曲循环的时候，把当前歌曲播放的当前时间设为开始。再设置播放
         this.$refs.audio.currentTime = 0;
         this.$refs.audio.play();
@@ -297,19 +304,19 @@
           this.currentLyric.seek(0);
         }
       },
-      ready(){
+      ready() {
         // 当前歌曲可以播放，也可以切换歌曲的状态
         this.songReady = true;
       },
-      error(){
+      error() {
         // 歌曲出现错误，也要可以点击切换
         this.songReady = true;
       },
-      updateTime(e){
+      updateTime(e) {
         // 监听媒体文件的currentTime，赋值给data中的currentTime，做vue的监听
         this.currentTime = e.target.currentTime;    //媒体文件的currentTime属性，可读可写
       },
-      onProgessBarChange(percent){
+      onProgessBarChange(percent) {
         // 当子组件的滚动条被改变的时候，根据返回的percent百分比，设置当前歌曲的播放位置
         const currentTime = this.currentSong.duration * percent;
         this.$refs.audio.currentTime = currentTime;
@@ -322,7 +329,7 @@
           this.currentLyric.seek(currentTime * 1000);
         }
       },
-      _getPosAndScale(){
+      _getPosAndScale() {
         const targetWidth = 40;               //小的播放器的CD宽度
         const paddingLeft = 40;               //小的CD圆心到左边框的距离
         const paddingBottom = 30;             //小的CD圆心到下边框的距离
@@ -334,14 +341,14 @@
         const y = window.innerHeight - paddingTop - width / 2 - paddingBottom;//y轴的偏移量
         return {x, y, scale};
       },
-      format(interval){
+      format(interval) {
         // 对当前播放时间和总时长做格式化调整
         interval = interval | 0;      //向下取整，效果 => Math.floor
         const minute = interval / 60 | 0;
         const second = this._pad(interval % 60);
         return minute + ":" + second;
       },
-      _pad(num, n = 2){
+      _pad(num, n = 2) {
         // 补零函数
         let length = num.toString().length;
         while (length < n) {
@@ -350,7 +357,7 @@
         }
         return num;
       },
-      _getLyric(){
+      _getLyric() {
         // 获取当前的歌曲歌词
         this.currentSong.getLyric().then((lyric) => {
           // console.log(lyric) lyric是一个长字符串
@@ -366,7 +373,7 @@
           this.currentLineNum = 0;
         })
       },
-      handleLyric({lineNum, txt}){                      //回调函数在每次歌词改变的时候就会触发
+      handleLyric({lineNum, txt}) {                      //回调函数在每次歌词改变的时候就会触发
         this.currentLineNum = lineNum;
         if (lineNum > 5) {                              // 当前行数超过5就开始滚动
           let lineEl = this.$refs.lyricLine[lineNum - 5]; // 滚动的是到当前元素-5的元素的位置，相对于显示的位置也就是上移一行。
@@ -376,14 +383,14 @@
         }
         this.playingLyric = txt;
       },
-      middleTouchStart(e){
+      middleTouchStart(e) {
         // start事件需要记录手指触碰到的位置，把该次触摸标志位设置为true
         this.touch.initiated = true;
         const touch = e.touches[0];
         this.touch.startX = touch.pageX;
         this.touch.startY = touch.pageY;
       },
-      middleTouchMove(e){
+      middleTouchMove(e) {
         if (!this.touch.initiated) {
           return
         }
@@ -411,7 +418,7 @@
         this.$refs.middleL.style.opacity = 1 - this.touch.percent;
         this.$refs.middleL.style[transitionDuration] = 0;
       },
-      middleTouchEnd(){
+      middleTouchEnd() {
         let offsetWidth = 0;
         let opacity = 0;
         // 当前是CD块，判断触摸滑动百分比是否大于10%，就判定松手可以切换页面了，否则动手反弹回原位
@@ -445,15 +452,15 @@
       ...mapMutations({
         setFullScreen: 'SET_FULLSCREEN',
         setPlaying: 'SET_PLAYING_STATE',
-        setCurrentIndex: 'SET_CURRENTINDEX',
-        setMode: 'SET_MODE',
-        setPlaylist: 'SET_PLAYLIST'
+        /* setCurrentIndex: 'SET_CURRENTINDEX',
+         setMode: 'SET_MODE',
+         setPlaylist: 'SET_PLAYLIST'*/
       })
     },
     watch: {
-      currentSong(newSong, oldSong){
+      currentSong(newSong, oldSong) {
         // 一般需要获取到Components对象的组件中控制该组件的显示隐藏 一定要使用v-show不要使用v-if否则第一次的时候会报 找不到元素的错误！！！
-        if (!newSong.id) {
+        if (!newSong.id) { // 防止删除歌曲的时候，删除完了，没有歌曲就会报错！！
           return;
         }
         // 如果currentSong的ID没有变化 就不能再次执行播放！
@@ -475,7 +482,7 @@
           this._getLyric();
         }, 1000)
       },
-      playing(newPlaying){
+      playing(newPlaying) {
         // 此处的playing应该是从state那边读取出来的，上面切换了playing会提交到state更改，之后再获取，就发生了改变
         // 一般需要获取到Components对象的组件中控制该组件的显示隐藏 一定要使用v-show不要使用v-if否则第一次的时候会报 找不到元素的错误！！！
         const audio = this.$refs.audio;
@@ -488,7 +495,8 @@
     components: {
       ProgressBar,
       ProgressCircle,
-      Scroll
+      Scroll,
+      PlayList
     }
   }
 </script>

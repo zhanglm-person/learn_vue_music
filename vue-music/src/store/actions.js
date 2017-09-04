@@ -85,3 +85,41 @@ export const deleteSearchHistory = function ({commit}, query) {
 export const clearSearchHistory = function ({commit}) {
   commit(types.SET_SEARCH_HISTORY, clearSearch());
 };
+
+export const deleteSong = function ({commit, state}, song) {
+  // 对象引用 使用slice创建一个副本 否则会直接更改原有数组
+  let playlist = state.playlist.slice();
+  let sequencelist = state.sequencelist.slice();
+  let currentIndex = state.currentIndex;
+
+  let pIndex = findIndex(playlist, song);
+  playlist.splice(pIndex, 1);
+  let sIndex = findIndex(sequencelist, song);
+  sequencelist.splice(sIndex, 1);
+
+  // 当前播放歌曲大于删除歌曲的位置，就把当前播放索引-- ;
+  // 如果当前播放是最后一首歌曲，且删除的也是最后一首歌曲，也要把当前播放索引--
+  if (currentIndex > pIndex || currentIndex === playlist.length) {
+    currentIndex--;
+  }
+
+  commit(types.SET_PLAYLIST, playlist);
+  commit(types.SET_SEQUENCELIST, sequencelist);
+  commit(types.SET_CURRENTINDEX, currentIndex);
+
+  const playingState = playlist.length > 0;
+  commit(types.SET_PLAYING_STATE, playingState);
+  /*if (!playlist.length) {   // 播放列表删完，停止播放
+    commit(types.SET_PLAYING_STATE, false);
+  } else {
+    // 播放列表仍有歌曲，就播放
+    commit(types.SET_PLAYING_STATE, true)
+  }*/
+};
+
+export const deleteSongList = function ({commit}) {
+  commit(types.SET_PLAYLIST, []);
+  commit(types.SET_SEQUENCELIST, []);
+  commit(types.SET_CURRENTINDEX, -1);
+  commit(types.SET_PLAYING_STATE, false);
+};
