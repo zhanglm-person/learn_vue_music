@@ -14,7 +14,7 @@ export function shuffle(arr) {
   }
   return _arr
 }
-// 节流函数
+// 节流函数（在某一个delay时间之内，多次触发函数，只执行一次）
 export function debounce(func, delay) {
   let timer;
 

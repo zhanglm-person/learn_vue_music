@@ -73,12 +73,15 @@
         this.clearSearchHistory();
       },*/
       blurInput() {
+        // 监听到列表滚动就 调用子组件的失焦事件
         this.$refs.searchBox.blur();
       },
       saveSearch() {
+        // 监听到列表的点击事件 保存当前的搜索内容
         this.saveSearchHistory(this.query)
       },
       onQueryChange(query) {
+        // 输入框的内容改变，父组件传给suggest的query也要改变
         this.query = query;
       },
       _getHotKey() {
@@ -90,6 +93,7 @@
         })
       },
       addQuery(query) {
+        // 点击热门搜索，要给input输入框添加点击的内容
         this.$refs.searchBox.setQuery(query);
       },
       ...mapActions([

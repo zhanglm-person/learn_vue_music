@@ -1,7 +1,7 @@
 import * as types from './mutations-type'
 import {shuffle} from 'common/js/util'
 import {playMode} from 'common/js/config'
-import {saveSearch,deleteSearch,clearSearch} from 'common/js/cache'
+import {saveSearch, deleteSearch, clearSearch} from 'common/js/cache'
 
 function findIndex(list, song) {      // 寻找歌曲在列表中的位置
   return list.findIndex((item) => {
@@ -34,7 +34,7 @@ export const randomPlay = function ({commit}, {list}) {
 };
 
 export const insertSong = function ({commit, state}, song) {
-  // 对象引用 使用slice创建一个副本
+  // 对象引用 使用slice创建一个副本 否则会直接更改原有数组
   let playlist = state.playlist.slice();
   let sequencelist = state.sequencelist.slice();
   let currentIndex = state.currentIndex;
@@ -55,7 +55,7 @@ export const insertSong = function ({commit, state}, song) {
       playlist.splice(fpIndex + 1, 1);
     }
   }
-
+  // 顺序播放列表的插入和删除歌曲（同playlist，如果有先插入后删除）
   let currentSIndex = findIndex(sequencelist, currentSong) + 1;
   let fsIndex = findIndex(sequencelist, song);
   sequencelist.splice(currentSIndex, 0, song);

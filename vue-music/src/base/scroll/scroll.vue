@@ -48,20 +48,20 @@
           probeType: this.probeType,
           click: this.click
         });
-        if (this.listenScroll) {//如果需要监听滚动事件，则向父组件响应scroll事件
+        if (this.listenScroll) {//如果需要监听滚动距离事件，则向父组件响应scroll事件
           let me = this;
           this.scroll.on('scroll', (pos) => {
             me.$emit('scroll', pos);
           })
         }
-        if (this.pullup) {
+        if (this.pullup) {    // 如果需要上拉加载，则在滚动到最大距离加50px的时候向父组件提交一个scrollToEnd触发事件
           this.scroll.on('scrollEnd', () => {
             if (this.scroll.y <= this.scroll.maxScrollY + 50) {
               this.$emit('scrollToEnd')
             }
           })
         }
-        if (this.beforeScroll) {
+        if (this.beforeScroll) {  // 需要监听滚动事件，当滚动的时候提交beforeScroll触发事件
           this.scroll.on('beforeScrollStart', () => {
             this.$emit('beforeScroll');
           })
