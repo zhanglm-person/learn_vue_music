@@ -12,7 +12,7 @@
             <span class="clear" @click="showConfirm"><i class="icon-clear"></i></span>
           </h1>
         </div>
-        <scroll ref="listContent" class="list-content" :data="sequencelist">
+        <scroll :refreshDelay="refreshDelay" ref="listContent" class="list-content" :data="sequencelist">
           <transition-group tag="ul" name="list">
             <li :key="item.id" ref="listItem" class="item" v-for="(item,index) in sequencelist"
                 @click="selectItem(item,index)">
@@ -28,7 +28,7 @@
           </transition-group>
         </scroll>
         <div class="list-operate">
-          <div class="add">
+          <div class="add" @click.stop="addSong">
             <i class="icon-add"></i>
             <span class="text">添加歌曲到队列</span>
           </div>
@@ -42,6 +42,7 @@
                text="是否清空播放列表？"
                @confirm="confirmClear"
       ></confirm>
+      <add-song ref="addSong"></add-song>
     </div>
   </transition>
 </template>
@@ -52,16 +53,19 @@
   import {playMode} from 'common/js/config'
   import Confirm from 'base/confirm/confirm'
   import {playerMixin} from 'common/js/mixin'
+  import AddSong from 'components/add-song/add-song'
 
   export default {
     mixins: [playerMixin],
     components: {
       Scroll,
-      Confirm
+      Confirm,
+      AddSong
     },
     data() {
       return {
-        showFlag: false
+        showFlag: false,
+        refreshDelay: 100
       }
     },
     computed: {
@@ -76,6 +80,9 @@
       ])*/
     },
     methods: {
+      addSong() {
+        this.$refs.addSong.show();
+      },
       showConfirm() {
         this.$refs.confirm.show();
       },

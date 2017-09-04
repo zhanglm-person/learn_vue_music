@@ -106,7 +106,7 @@
   import ProgressBar from 'base/progress-bar/progress-bar'
   import ProgressCircle from 'base/progress-circle/progress-circle'
   import Scroll from 'base/scroll/scroll'
-  import {mapGetters, mapMutations} from 'vuex'
+  import {mapGetters, mapMutations, mapActions} from 'vuex'
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from 'common/js/dom'
   import {playMode} from 'common/js/config'
@@ -307,6 +307,7 @@
       ready() {
         // 当前歌曲可以播放，也可以切换歌曲的状态
         this.songReady = true;
+        this.savePlayHistory(this.currentSong);
       },
       error() {
         // 歌曲出现错误，也要可以点击切换
@@ -455,7 +456,10 @@
         /* setCurrentIndex: 'SET_CURRENTINDEX',
          setMode: 'SET_MODE',
          setPlaylist: 'SET_PLAYLIST'*/
-      })
+      }),
+      ...mapActions([
+        'savePlayHistory'
+      ])
     },
     watch: {
       currentSong(newSong, oldSong) {

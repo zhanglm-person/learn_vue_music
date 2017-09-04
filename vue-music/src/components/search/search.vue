@@ -4,7 +4,7 @@
       <search-box ref="searchBox" @query="onQueryChange"></search-box>
     </div>
     <div ref="shortcutWrapper" class="shortcut-wrapper" v-show="!query">
-      <scroll class="shortcut" :data="shortcut" ref="shortcut">
+      <scroll :refreshDelay='refreshDelay' class="shortcut" :data="shortcut" ref="shortcut">
         <div>
           <div class="hot-key">
             <h1 class="title">热门搜索</h1>
@@ -48,24 +48,24 @@
   import Confirm from 'base/confirm/confirm'
   import {getHotKey} from 'api/search'
   import {ERR_OK} from 'api/config'
-  import {mapActions, mapGetters} from 'vuex'
-  import {playlistMixin} from 'common/js/mixin'
+  import {mapActions} from 'vuex'
+  import {playlistMixin, searchMixin} from 'common/js/mixin'
 
   export default {
-    mixins: [playlistMixin],
+    mixins: [playlistMixin, searchMixin],
     data() {
       return {
         hotKey: [],
-        query: ''
+        //query: ''
       }
     },
     computed: {
       shortcut() {
         return this.hotKey.concat(this.searchHistory)
       },
-      ...mapGetters([
+      /*...mapGetters([
         'searchHistory'
-      ])
+      ])*/
     },
     created() {
       this._getHotKey();
@@ -85,18 +85,22 @@
         this.$refs.confirm.show();
         // this.clearSearchHistory();
       },
+      /*onQueryChange(query) {
+        // 输入框的内容改变，父组件传给suggest的query也要改变
+        this.query = query;
+      },
       blurInput() {
         // 监听到列表滚动就 调用子组件的失焦事件
         this.$refs.searchBox.blur();
       },
+      addQuery(query) {
+        // 点击热门搜索，要给input输入框添加点击的内容
+        this.$refs.searchBox.setQuery(query);
+      },
       saveSearch() {
         // 监听到列表的点击事件 保存当前的搜索内容
         this.saveSearchHistory(this.query)
-      },
-      onQueryChange(query) {
-        // 输入框的内容改变，父组件传给suggest的query也要改变
-        this.query = query;
-      },
+      },*/
       _getHotKey() {
         getHotKey().then((rsp) => {
           if (rsp.code === ERR_OK) {
@@ -105,13 +109,9 @@
           }
         })
       },
-      addQuery(query) {
-        // 点击热门搜索，要给input输入框添加点击的内容
-        this.$refs.searchBox.setQuery(query);
-      },
       ...mapActions([
-        'saveSearchHistory',
-        'deleteSearchHistory',
+        //'saveSearchHistory',
+        //'deleteSearchHistory',
         'clearSearchHistory'
       ])
     },

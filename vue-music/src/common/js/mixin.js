@@ -105,7 +105,7 @@ export const searchMixin = {
   },
   methods: {
     onQueryChange(query) {
-      this.query = query
+      this.query = query;
     },
     blurInput() {
       this.$refs.searchBox.blur()
@@ -121,4 +121,4 @@ export const searchMixin = {
       'deleteSearchHistory'
     ])
   }
-}
+};
