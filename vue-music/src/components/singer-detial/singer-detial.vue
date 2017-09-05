@@ -35,26 +35,27 @@
     methods: {
       _getDetail() {
         if (!this.singer.id) {
-          this.$router.push('/singer')
+          this.$router.push('/singer');
           return
         }
         getSingerDetial(this.singer.id).then((res) => {
           if (res.code === ERR_OK) {
+            // 在歌手详情页面得到的songs列表，要传入两层到song-list组件遍历。
             this.songs = this._normalizeSongs(res.data.list)
-            //console.log(this.songs)
+            // console.log(this.songs)
           }
         })
       },
       _normalizeSongs(list) {
-        let ret = []
+        let ret = [];
         list.forEach((item) => {
           //let {musicData} = item          es6 对象结构赋值
           let musicData = item.musicData;
           if (musicData.songid && musicData.albummid) {
-            //根据工厂方法 创建一个song
+            //根据工厂方法 创建一个song,只有是Song的事例才可以点击播放，并且添加到vuex管理
             ret.push(createSong(musicData))
           }
-        })
+        });
         return ret
       }
     },

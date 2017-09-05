@@ -307,6 +307,7 @@
       ready() {
         // 当前歌曲可以播放，也可以切换歌曲的状态
         this.songReady = true;
+        // 这里的this.currentSong本身是一个Song的事例，但是保存到localStorage中之后，只能是一个个字符串（对象），所以取的时候，要再次转换成Song的事例才可以进行操作。
         this.savePlayHistory(this.currentSong);
       },
       error() {

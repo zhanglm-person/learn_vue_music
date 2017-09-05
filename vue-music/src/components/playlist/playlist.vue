@@ -65,7 +65,7 @@
     data() {
       return {
         showFlag: false,
-        refreshDelay: 100
+        refreshDelay: 100  // 这里设置refreshDelay，是因为避免用户操作动画之后，scroll组件刷新已经完成。所以延长scroll组件监听到data变化后的刷新时间。
       }
     },
     computed: {

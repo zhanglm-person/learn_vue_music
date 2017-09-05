@@ -16,12 +16,13 @@
                   @switch="switchItem"
         ></switches>
         <div class="list-wrapper">
-          <scroll  ref="songlistwrapper" class="list-scroll" v-if="currentIndex===0" :data="playHistory">
+          <scroll ref="songlistwrapper" class="list-scroll" v-if="currentIndex===0" :data="playHistory">
             <div class="list-inner">
               <song-list :songs="playHistory" @select="selectSong"></song-list>
             </div>
           </scroll>
-          <scroll :refreshDelay="refreshDelay" ref="searchlistwrapper" class="list-scroll" v-if="currentIndex===1" :data="searchHistory">
+          <scroll :refreshDelay="refreshDelay" ref="searchlistwrapper" class="list-scroll" v-if="currentIndex===1"
+                  :data="searchHistory">
             <div class="list-inner">
               <search-list @delete="deleteSearchHistory" @select="addQuery" :searches="searchHistory"></search-list>
             </div>
@@ -88,6 +89,7 @@
     methods: {
       show() {
         this.showFlag = true;
+        // 由于add-song本身是隐藏的，但是scroll已经被初始化了。所以在add-song显示的时候，刷新scroll组件，不然不会滚动
         setTimeout(() => {
           if (this.currentIndex === 0) {
             this.$refs.songlistwrapper.refresh();
@@ -100,9 +102,11 @@
         this.showFlag = false;
       },
       search(query) {
+        // 子组件传递过来的用户输入的query，再由父组件传递给另一个suggest组件
         this.query = query;
       },
       selectSuggest() {
+        // 点击搜索之后的列表单个内容，要保存搜索记录，并且显示tip
         this.saveSearch();
         this.showTopTip();
       },
@@ -110,12 +114,15 @@
         this.currentIndex = index;
       },
       selectSong(song, index) {
+        // console.log(song)
+        // 如果点击的是正在播放的歌曲，就不用往播放列表里面添加。如果点击不是正在播放的歌曲，因为当前的最近播放列表是从本地存储中读取的,是一个个字符串（对象），不是 所需的 Song 的事例，所以要把存储的song用Song类实例化一下，再添加到播放列表。添加完成之后，显示tip提示
         if (index !== 0) {
           this.insertSong(new Song(song));
           this.showTopTip();
         }
       },
       showTopTip() {
+        // 父组件调用子组件tip的显示方法
         this.$refs.topTip.show();
       },
       ...mapActions([

@@ -1,3 +1,6 @@
+// 当前播放的歌曲是由currentIndex和playlist来控制的。所以设置了这两个中的任一个都会导致
+// playlist[currentIndex]当前播放歌曲的改变，从而切换播放歌曲！！！
+
 import * as types from './mutations-type'
 import {shuffle} from 'common/js/util'
 import {playMode} from 'common/js/config'
@@ -32,7 +35,7 @@ export const randomPlay = function ({commit}, {list}) {
   commit(types.SET_PLAYING_STATE, true);
   commit(types.SET_FULLSCREEN, true);
 };
-
+// 插入歌曲是在当前播放歌曲的后面插入这首歌，并且播放插入的歌曲！
 export const insertSong = function ({commit, state}, song) {
   // 对象引用 使用slice创建一个副本 否则会直接更改原有数组
   let playlist = state.playlist.slice();
@@ -42,12 +45,12 @@ export const insertSong = function ({commit, state}, song) {
   let currentSong = playlist[currentIndex];
   // 查找当前列表是否有当前歌曲，返回索引
   let fpIndex = findIndex(playlist, song);
-  // 插入歌曲，索引加一
+  // 插入歌曲，当前索引加一
   currentIndex++;
-  //插入当前点击的歌曲到当前播放位置，就可以播放
+  //插入当前点击的歌曲到当前播放位置的下个位置，然后设置currentIndex，就可以播放当前插入的歌曲
   playlist.splice(currentIndex, 0, song);
 
-  if (fpIndex > -1) {   //已包含这首歌
+  if (fpIndex > -1) {               //已包含这首歌
     if (currentIndex > fpIndex) {   // 当前插入序号大于之前列表序号
       playlist.splice(fpIndex, 1);
       currentIndex--;
@@ -55,7 +58,8 @@ export const insertSong = function ({commit, state}, song) {
       playlist.splice(fpIndex + 1, 1);
     }
   }
-  // 顺序播放列表的插入和删除歌曲（同playlist，如果有先插入后删除）
+  // 顺序播放列表的插入和删除歌曲（同playlist，如果有先插入(插入是在当前播放歌曲的后面插入)后删除）
+  // 顺序列表是在点击歌曲播放列表时候展开的
   let currentSIndex = findIndex(sequencelist, currentSong) + 1;
   let fsIndex = findIndex(sequencelist, song);
   sequencelist.splice(currentSIndex, 0, song);

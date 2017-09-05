@@ -33,7 +33,7 @@
         type: Boolean,
         default: false
       },
-      refreshDelay:{
+      refreshDelay: {     // 监听data变化刷新scroll的延时，默认20，如果有操作data改变的动画，要加长这个延时时间，不然有几率产生刷新
         type: Number,
         default: 20
       }

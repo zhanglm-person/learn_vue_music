@@ -95,7 +95,7 @@ export const searchMixin = {
   data() {
     return {
       query: '',
-      refreshDelay: 120
+      refreshDelay: 120 // 这里设置refreshDelay，是因为避免用户操作动画之后，scroll组件刷新已经完成。所以延长scroll组件监听到data变化后的刷新时间。
     }
   },
   computed: {

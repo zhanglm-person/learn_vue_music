@@ -98,6 +98,7 @@
         // 回退 router
       },
       select(item, index){
+        //console.log(item)
         //设置playlist 和 sequencelist ...
         //传入的item不用，是因为 song-list组件只能提供当前的元素以及索引，但是列表是父组件的songs。子组件不关心外部事件，尽可能做自己所做的
         this.selectPlay({
