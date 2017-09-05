@@ -56,7 +56,7 @@ export const playerMixin = {
     resetCurrentIndex(list) {
       let index = list.findIndex((item) => {
         return item.id === this.currentSong.id
-      })
+      });
       this.setCurrentIndex(index)
     },
     toggleFavorite(song) {
@@ -72,10 +72,10 @@ export const playerMixin = {
       }
       return 'icon-not-favorite'
     },
-    isFavorite(song) {
+    isFavorite(song) {            // 判断是不是收藏的歌曲
       const index = this.favoriteList.findIndex((item) => {
         return item.id === song.id
-      })
+      });
       return index > -1
     },
     ...mapMutations({

@@ -1,5 +1,5 @@
 import {playMode} from 'common/js/config'
-import {loadSearch, loadPlay} from 'common/js/cache'
+import {loadSearch, loadPlay, loadFavorite} from 'common/js/cache'
 
 const state = {
   singer: {},
@@ -12,10 +12,12 @@ const state = {
   disc: {},
   toplist: {},
   searchHistory: loadSearch(),
-  playHistory: loadPlay()
+  playHistory: loadPlay(),
+  favoriteList: loadFavorite()
 };
 
 export default state
 /*
+*
 * 导出的state本身就是一个对象，不需要再次加上｛｝!!!!
 * */

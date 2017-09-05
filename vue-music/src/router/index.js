@@ -5,12 +5,13 @@ import Recommend from 'components/recommend/recommend'
 import Rank from 'components/rank/rank'
 import Search from 'components/search/search'
 import Singer from 'components/singer/singer'
+import UserCenter from 'components/user-center/user-center'
 
 import SingerDetial from 'components/singer-detial/singer-detial'
 import Disc from 'components/disc/disc'
 import TopList from 'components/top-list/top-list'
 
-Vue.use(Router)
+Vue.use(Router);
 
 /*
  const SingerDetial = (resolve) => {
@@ -63,6 +64,10 @@ export default new Router({
           component: SingerDetial
         }
       ]
+    },
+    {
+      path: "/user",
+      component: UserCenter
     }
   ]
 })
