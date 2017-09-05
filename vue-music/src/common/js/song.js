@@ -50,13 +50,13 @@ export function createSong(musicData) {
 
 export function filterSinger(singer) {
   // 定义一个把数组组合成字符串的方法
-  let ret = []
+  let ret = [];
   if (!singer) {
     return ''
   }
   singer.forEach((s) => {
     ret.push(s.name)
-  })
+  });
   return ret.join('/')
 }
 

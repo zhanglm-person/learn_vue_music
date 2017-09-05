@@ -96,7 +96,7 @@
       </div>
     </transition>
     <play-list ref="playlist"></play-list>
-    <audio :src="currentSong.url" ref="audio" @timeupdate="updateTime" @canplay="ready" @error="error"
+    <audio :src="currentSong.url" ref="audio" @timeupdate="updateTime" @play="ready" @error="error"
            @ended="end"></audio>
   </div>
 </template>
@@ -255,7 +255,7 @@
         }
         if (this.playlist.length === 1) {
           this.loop();
-          return;
+          return;// return是防止一首歌曲的时候，上下切换，songReady不能重置回true
         } else {
           let index = this.currentIndex - 1;
           if (index === -1) {
@@ -274,7 +274,7 @@
         }
         if (this.playlist.length === 1) {
           this.loop();
-          return;
+          return;   // return是防止一首歌曲的时候，上下切换，songReady不能重置回true
         } else {
           let index = this.currentIndex + 1;
           if (index === this.playlist.length) {
@@ -362,6 +362,10 @@
       _getLyric() {
         // 获取当前的歌曲歌词
         this.currentSong.getLyric().then((lyric) => {
+          // 切换过快。如果当前歌曲的lyric不是当前歌曲请求过来的lyric，就return，直到相等，再添加歌词，防止多次 new 歌词 然后播放产生混乱
+          if (this.currentSong.lyric !== lyric) {
+            return;
+          }
           // console.log(lyric) lyric是一个长字符串
           this.currentLyric = new Lyric(lyric, this.handleLyric); // 利用Lyric创建一个对象,传入歌词字符串和回调函数，回调函数可以获取当前播放的第几条歌词和内容
           // console.log(this.currentLyric)
@@ -485,7 +489,7 @@
         this.timer = setTimeout(() => {
           this.$refs.audio.play();
           this._getLyric();
-        }, 1000)
+        }, 1000)    // 延迟一秒=>保证手机页面从后台切到前台，可以执行play方法/切换过快
       },
       playing(newPlaying) {
         // 此处的playing应该是从state那边读取出来的，上面切换了playing会提交到state更改，之后再获取，就发生了改变
