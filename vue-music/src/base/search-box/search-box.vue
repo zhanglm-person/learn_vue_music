@@ -33,6 +33,7 @@
       }
     },
     created() {
+      // 去抖函数，减少输入查询次数，降低服务器压力
       this.$watch('query', debounce((newQuery) => {
         this.$emit('query', newQuery);
       }, 200))
