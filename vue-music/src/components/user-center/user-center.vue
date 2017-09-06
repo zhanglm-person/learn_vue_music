@@ -102,7 +102,9 @@
         list = list.map((song) => {
           return new Song(song);
         });
-        this.randomPlay(list);
+        this.randomPlay({
+          list
+        })
       },
       ...mapActions([
         'insertSong',
