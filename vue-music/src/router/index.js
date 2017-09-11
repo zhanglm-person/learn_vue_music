@@ -6,7 +6,6 @@ import Router from 'vue-router'
 //import Search from 'components/search/search'
 //import Singer from 'components/singer/singer'
 //import UserCenter from 'components/user-center/user-center'
-
 //import SingerDetial from 'components/singer-detial/singer-detial'
 //import Disc from 'components/disc/disc'
 //import TopList from 'components/top-list/top-list'

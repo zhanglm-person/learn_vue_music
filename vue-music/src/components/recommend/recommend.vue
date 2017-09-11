@@ -35,7 +35,7 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import slider from 'base/slider/slider'
+  import Slider from 'base/slider/slider'
   import Scroll from 'base/scroll/scroll'
   import Loading from 'base/loading/loading'
   import {playlistMixin} from 'common/js/mixin'
@@ -44,44 +44,45 @@
 
   import {mapMutations} from 'vuex'
 
-  export default{
+  export default {
     mixins: [playlistMixin],
     components: {
-      slider,
+      Slider,
       Scroll,
       Loading
     },
-    data(){
+    data() {
       return {
         recommends: [],
         discList: []
       }
     },
-    created(){
+    created() {
       this._getRecommend();
       this._getDiscList();
     },
     methods: {
-      selectItem(item, index){
+      selectItem(item, index) {
         this.$router.push({
           path: '/recommend/' + item.dissid
         });
         this.setDisc(item);
       },
-      handlePlaylist(playlist){
+      handlePlaylist(playlist) {
         const bottom = playlist.length > 0 ? '60px' : '';
         this.$refs.recommend.style.bottom = bottom;
         this.$refs.scroll.refresh();
       },
-      _getRecommend(){
+      _getRecommend() {
         getRecommend().then((rsp) => {
           if (rsp.code === ERR_OK) {
             //console.log(rsp.data.slider);
             this.recommends = rsp.data.slider;
+            // 异步获取数据，要保证获取到数据之后才能进对数据元素的操作，所以要给轮播图组件的容器加上v-if，防止数据没有获取到就进行了，slider组件的初始化操作。
           }
         })
       },
-      _getDiscList(){
+      _getDiscList() {
         getDiscList().then((rsp) => {
           if (rsp.code === ERR_OK) {
             //console.log(rsp.data.list);
@@ -89,7 +90,7 @@
           }
         })
       },
-      loadImg(){
+      loadImg() {
         if (!this.checkLoaded) {
           this.checkLoaded = true;
           this.$refs.scroll.refresh();

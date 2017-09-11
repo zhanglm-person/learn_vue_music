@@ -26,7 +26,7 @@ export function getDiscList() {
     needNewCode: 0,
     categoryId: 10000000,
     rnd: Math.random(),
-    format: 'json'
+    format: 'json'    // 需要修改format,不然是jsonp
   });
 
   return axios.get(url, {

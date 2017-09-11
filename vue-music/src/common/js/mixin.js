@@ -21,7 +21,7 @@ export const playlistMixin = {
     }
   },
   methods: {
-    handlePlaylist() {                // 组件中要再次声明handlePlaylist函数，否则调用当前函数报错
+    handlePlaylist() {           // 组件中要再次声明handlePlaylist函数，否则调用当前函数报错
       throw new Error('component must implement handlePlaylist method')
     }
   }
@@ -76,7 +76,7 @@ export const playerMixin = {
       const index = this.favoriteList.findIndex((item) => {
         return item.id === song.id
       });
-      return index > -1
+      return index > -1          // 是收藏的歌曲就会大于-1，否则就是false
     },
     ...mapMutations({
       setMode: 'SET_MODE',
