@@ -80,10 +80,10 @@
       refresh() {
         this.scroll && this.scroll.refresh()
       },
-      scrollTo() {
+      scrollTo() {      // 因为要接受参数，就把this指向换到当前scroll，并传入参数
         this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
       },
-      scrollToElement() {
+      scrollToElement() {// 因为要接受参数，就把this指向换到当前scroll，并传入参数
         this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)
       }
     },

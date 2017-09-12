@@ -14,8 +14,13 @@
       <div class="filter" ref="filter"></div>
     </div>
     <div class="bg-layer" ref="bgLayer"></div>
-    <scroll :data="songs" @scroll="scroll" :probe-type="probeType" :listen-scroll="listenScroll" class="list"
-            ref="list">
+    <scroll :data="songs"
+            @scroll="scroll"
+            :probe-type="probeType"
+            :listen-scroll="listenScroll"
+            class="list"
+            ref="list"
+    >
       <div class="song-list-wrapper">
         <song-list @select="select" :rank="rank" :songs="songs"></song-list>
       </div>
@@ -33,11 +38,12 @@
   import {prefixStyle} from 'common/js/dom'
   import {mapActions} from 'vuex'
   import {playlistMixin} from 'common/js/mixin'
+
   const RESERVED_HEIGHT = 40;
 
   const transform = prefixStyle('transform');
   const backdrop = prefixStyle('backdrop-filter');
-  export default{
+  export default {
     mixins: [playlistMixin],
     components: {
       Scroll,
@@ -62,51 +68,51 @@
         default: false
       }
     },
-    data(){
+    data() {
       return {
         scrollY: 0
       }
     },
     computed: {
-      bgStyle(){
+      bgStyle() {
         return `background-image:url(${this.bgImg})`
       }
     },
-    created(){
-      this.probeType = 3;       //监听scroll组件的滚动,并且返回位置
-      this.listenScroll = true; //监听scroll组件的滚动
+    created() {
+      this.probeType = 3;       // 监听scroll组件的滚动,并且返回位置
+      this.listenScroll = true; // 监听scroll组件的滚动
     },
-
-    mounted(){
-      this.imgHeight = this.$refs.bgImg.clientHeight;   //获取到图片的高度
+    mounted() {
+      this.imgHeight = this.$refs.bgImg.clientHeight;   // 获取到图片的高度
       this.minTranslateY = -this.imgHeight + RESERVED_HEIGHT; // 取消掉顶部的固定的高度
-      //this.$refs对应取到的是components对象，需要拿到 $el 取真实的DOM
+      // this.$refs对应取到的是components对象，需要拿到 $el 取真实的DOM
+      // 背景图的大小随着设备尺寸不同，所以要根据 背景图的高度 来设置
       this.$refs.list.$el.style.top = this.imgHeight + "px";
     },
     methods: {
-      handlePlaylist(playlist){
+      handlePlaylist(playlist) {
         // 这里的playlist是mixin里面带出来的
         const bottom = playlist.length > 0 ? '60px' : '';
         this.$refs.list.$el.style.bottom = bottom;  // 改变scroll组件的视口高度然后刷新scroll
         this.$refs.list.refresh();
       },
-      scroll(pos){
+      scroll(pos) {
         this.scrollY = pos.y;
       },
-      back(){
+      back() {
         this.$router.back();
         // 回退 router
       },
-      select(item, index){
-        //console.log(item)
-        //设置playlist 和 sequencelist ...
-        //传入的item不用，是因为 song-list组件只能提供当前的元素以及索引，但是列表是父组件的songs。子组件不关心外部事件，尽可能做自己所做的
+      select(item, index) {
+        // console.log(item)
+        // 设置playlist 和 sequencelist ...
+        // 传入的item不用，是因为 song-list组件只能提供当前的元素以及索引，但是列表是父组件的songs。子组件不关心外部事件，尽可能做自己所做的
         this.selectPlay({
           list: this.songs,
           index
         })
       },
-      random(){
+      random() {
         this.randomPlay({
           list: this.songs,
         })
@@ -117,8 +123,8 @@
       ])
     },
     watch: {
-      scrollY(newY){
-        let translateY = Math.max(this.minTranslateY, newY);  //负值 所以要比较最大值出来
+      scrollY(newY) {
+        let translateY = Math.max(this.minTranslateY, newY);  // 负值 所以要比较最大值出来
         let zIndex = 0;
         let scale = 1;
         let blur = 0;
@@ -132,7 +138,7 @@
           blur = Math.min(20 * percent, 20); //最大是20
         }
         this.$refs.filter.style[backdrop] = 'blur(' + blur + 'px)';
-        if (this.minTranslateY > newY) {  //判断已经滚动到顶部了，要增大bgImg的层级，减少高度（paddingTop撑起来的），隐藏随机播放全部按钮
+        if (this.minTranslateY > newY) {  // 判断已经滚动到顶部了，要增大bgImg的层级，减少高度（paddingTop撑起来的），隐藏随机播放全部按钮
           zIndex = 10;
           this.$refs.bgImg.style.paddingTop = 0;
           this.$refs.bgImg.style.height = RESERVED_HEIGHT + "px";

@@ -17,39 +17,41 @@
 
   const HOT_NAME = "热门";
   const HOT_SINGER_LENGTH = 10;
-  export default{
-    mixins:[playlistMixin],
+  export default {
+    mixins: [playlistMixin],
     components: {
       ListView
     },
-    data(){
+    data() {
       return {
         singers: []
       }
     },
-    created(){
+    created() {
       this._getSingerList();
     },
     methods: {
-      handlePlaylist(playlist){
-        const bottom = playlist.length > 0 ? '60px' :'';
+      handlePlaylist(playlist) {
+        const bottom = playlist.length > 0 ? '60px' : '';
         this.$refs.singer.style.bottom = bottom;
         this.$refs.listview.refresh();
       },
-      selectSinger(singer){
+      selectSinger(singer) {
         this.$router.push({
           path: `/singer/${singer.id}`
         });
         this.setSinger(singer);
       },
-      _getSingerList(){
+      _getSingerList() {
         getSingerList().then((rsp) => {
           if (rsp.code === ERR_OK) {
-            this.singers = this._normallizeSinger(rsp.data.list)
+            // console.log(rsp.data.list)
+            this.singers = this._normallizeSinger(rsp.data.list);
+            // console.log(this.singers);
           }
         })
       },
-      _normallizeSinger(list){
+      _normallizeSinger(list) {
         let map = {
           hot: {
             title: HOT_NAME,
@@ -64,7 +66,7 @@
             }))
           }
           const key = item.Findex;
-          //每一个歌手的Findex是她的首字母大写，如果map中没有当前首字母属性，就添加。有就直接push
+          // 每一个歌手的Findex是她的首字母大写，如果map中没有当前首字母属性，就添加。有就直接push
           if (!map[key]) {
             map[key] = {
               title: key,

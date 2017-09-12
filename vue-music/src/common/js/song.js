@@ -1,7 +1,7 @@
 import {getLyric} from 'api/song'
 import {ERR_OK} from 'api/config'
 import {Base64} from 'js-base64'
-
+// 单例模式
 export default class Song {
   // 类 是面向对象编程 扩展性好
   constructor({id, mid, singer, name, album, duration, image, url}) {
@@ -14,6 +14,7 @@ export default class Song {
     this.image = image
     this.url = url
   }
+
   // 获取歌词，当作歌曲类的一个属性
   getLyric() {
     // 如果当前歌曲已经有 lyric ，就直接返回一个 Promise
@@ -34,7 +35,7 @@ export default class Song {
   }
 }
 
-
+// 工厂方法
 export function createSong(musicData) {
   return new Song({
     id: musicData.songid,

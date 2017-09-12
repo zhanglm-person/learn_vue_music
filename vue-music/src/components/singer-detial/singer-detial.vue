@@ -12,6 +12,7 @@
   import {ERR_OK} from 'api/config'
   import {createSong} from 'common/js/song'
   import {mapGetters} from 'vuex'
+
   export default {
     computed: {
       title() {

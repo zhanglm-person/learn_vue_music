@@ -21,7 +21,6 @@
       <ul>
         <li :class="{'current':currentIndex===index}" class="item" v-for="(item,index) in shorcutlist"
             :data-index="index">{{item}}
-
         </li>
       </ul>
     </div>
@@ -40,22 +39,23 @@
   import Scroll from 'base/scroll/scroll'
   import {getData} from 'common/js/dom'
   import Loading from 'base/loading/loading'
+
   const ANCHOR_HEIGHT = 18;
   const TITLE_HEIGHT = 30;
 
-  export default{
+  export default {
     components: {
       Scroll,
       Loading
     },
     computed: {
-      shorcutlist(){
+      shorcutlist() {
         //显示的固定的列表首字母
         return this.data.map((group) => {
           return group.title.substr(0, 1)
         })
       },
-      fixedTitle(){
+      fixedTitle() {
         //如果是下拉的  不会返回title
         if (this.scrollY > 0) { //scrollY往上翻滚应该是负值
           return ""
@@ -70,51 +70,51 @@
         default: []
       }
     },
-    data(){
+    data() {
       return {
         scrollY: -1,
         currentIndex: 0,
         diff: 0
       }
     },
-    created(){
+    created() {
       this.touch = {};
       this.listenScroll = true;
       this.listHeight = [];
       this.probeType = 3;//需要子组件scroll实时记录滚动状态
     },
     methods: {
-      refresh(){
+      refresh() {
         this.$refs.listview.refresh();
       },
-      selectItem(item){
-        this.$emit("select",item);
+      selectItem(item) {
+        this.$emit("select", item);
       },
-      onShortcutTouchStart(e){
+      onShortcutTouchStart(e) {
         //console.log(e.target);
-        let anchorIndex = getData(e.target, "index");
+        let anchorIndex = getData(e.target, "index");   // 字符串类型
         let firstTouch = e.touches[0];
         //console.log(firstTouch)
         this.touch.y1 = firstTouch.pageY;
-        this.touch.anchorIndex = anchorIndex;//第一次触碰的小字母的index
+        this.touch.anchorIndex = anchorIndex; //第一次触碰的小字母的index
 
         this._scrollTo(anchorIndex);
       },
-      onShortcutTouchMove(e){
+      onShortcutTouchMove(e) {
         let firstTouch = e.touches[0];
         //console.log(firstTouch)
         this.touch.y2 = firstTouch.pageY;
         //console.log(this.touch.y2 - this.touch.y1)
         //从触摸开始到目前位置的距离差值，除以每个锚点小字母的高度，算出当前的index
-        let delta = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT | 0;
+        let delta = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT | 0;//或0就是向下取整
         let anchorIndex = parseInt(this.touch.anchorIndex) + delta;
         //计算当前滚动到的小字母的index，让左边的列表也滚动倒相对应的位置.有可能是小于0的，因为delta是可以弹性滚动产生的负值
         this._scrollTo(anchorIndex);
       },
-      scroll(pos){
+      scroll(pos) {
         this.scrollY = pos.y;
       },
-      _calculateHeight(){
+      _calculateHeight() {
         // 计算当前列表，每个字母组合的距离顶部的高低，拼成数组
         this.listHeight = [];
         const list = this.$refs.listGroup;
@@ -122,13 +122,14 @@
         this.listHeight.push(height);
         for (let i = 0; i < list.length; i++) {
           let item = list[i];
-          height += item.clientHeight;
+          height += item.clientHeight;// DOM可以用clientHeight获取高度
           this.listHeight.push(height);
         }
         //console.log(this.listHeight)
         //console.log(this.$refs.listGroup)
       },
-      _scrollTo(index){
+      _scrollTo(index) {
+        // 点击小锚点列表之外的元素就直接返回
         if (!index && index !== 0) {
           return
         }
@@ -140,19 +141,19 @@
         }
         this.scrollY = -this.listHeight[index];
         //scrollY本身应该是负值，listHeight是左边的列表高度数组
-        this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0);
+        this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0); // 第二个参数，动画缓动时间
       }
     },
     watch: {
-      data(){
-        //进入页面后20s计算高度，为了避免DOM没有加载完成
+      data() {
+        //进入页面后20ms计算高度，为了避免DOM没有加载完成
         setTimeout(() => {
           this._calculateHeight()
         }, 20)
       },
-      scrollY(newY){
+      scrollY(newY) {
         const listHeight = this.listHeight;
-        //newY为负是表示往下滚动，正的就是表名上滚动到第一个且弹性拉取了，
+        //newY为负是表示往下滚动，正的就是表明上滚动到第一个且弹性拉取了，
         if (newY > 0) {
           this.currentIndex = 0;
           return;
@@ -164,17 +165,18 @@
             //只要当前滚动的距离的值在某个区间内，diff就会重新计算，从而比较和title的高度，推动title的上偏移
             this.currentIndex = i;
             //console.log(newY + "=====")
-            this.diff = height2 + newY; //计算滚动和当前组的差值
-
+            this.diff = height2 + newY; //计算滚动和当前组的差值(滚动视口和下一个group的title上部)
             return;
           }
         }
+        // 滚动到最后一个，且大于最后一个元素的上限
         this.currentIndex = listHeight.length - 2;
       },
-      diff(newVal){
-        //console.log(newVal)
-        //获取到实时的 滚动距离和当前组高度差值，如果小于30（TITLE_HEIGHT）就让title的位置上偏移该差值
+      diff(newVal) {
+        // console.log(newVal)
+        //获取到实时的 滚动距离和当前组高度的上限差值，如果小于30（TITLE_HEIGHT）就让title的位置上偏移该差值
         let fixedTop = (newVal > 0 && newVal < TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0;
+        // diff是实时变化的，如果一直是0，就不需要修改transform，节省DOM操作
         if (this.fixedTop === fixedTop) {
           return
         }
