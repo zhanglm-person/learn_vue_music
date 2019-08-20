@@ -43,93 +43,93 @@
 </template>
 
 <script type='text/ecmascript-6'>
-  import SearchBox from 'base/search-box/search-box'
-  import SongList from 'base/song-list/song-list'
-  import SearchList from 'base/search-list/search-list'
-  import Suggest from 'components/suggest/suggest'
-  import TopTip from 'base/top-tip/top-tip'
-  import {searchMixin} from 'common/js/mixin'
-  import Switches from 'base/switches/switches'
-  import Scroll from 'base/scroll/scroll'
-  import {mapGetters, mapActions} from 'vuex'
-  import Song from 'common/js/song'
+import SearchBox from 'base/search-box/search-box'
+import SongList from 'base/song-list/song-list'
+import SearchList from 'base/search-list/search-list'
+import Suggest from 'components/suggest/suggest'
+import TopTip from 'base/top-tip/top-tip'
+import { searchMixin } from 'common/js/mixin'
+import Switches from 'base/switches/switches'
+import Scroll from 'base/scroll/scroll'
+import { mapGetters, mapActions } from 'vuex'
+import Song from 'common/js/song'
 
-  export default {
-    mixins: [searchMixin],
-    components: {
-      SearchBox,
-      Suggest,
-      Switches,
-      Scroll,
-      SongList,
-      SearchList,
-      TopTip
+export default {
+  mixins: [searchMixin],
+  components: {
+    SearchBox,
+    Suggest,
+    Switches,
+    Scroll,
+    SongList,
+    SearchList,
+    TopTip
+  },
+  computed: {
+    ...mapGetters([
+      'playHistory'
+    ])
+  },
+  data () {
+    return {
+      showFlag: false,
+      // query: '',
+      showSinger: false,
+      currentIndex: 0,
+      switches: [
+        {
+          name: '最近播放'
+        },
+        {
+          name: '搜索历史'
+        }
+      ]
+    }
+  },
+  methods: {
+    show () {
+      this.showFlag = true
+      // 由于add-song本身是隐藏的，但是scroll已经被初始化了。所以在add-song显示的时候，刷新scroll组件，不然不会滚动
+      setTimeout(() => {
+        if (this.currentIndex === 0) {
+          this.$refs.songlistwrapper.refresh()
+        } else {
+          this.$refs.searchlistwrapper.refresh()
+        }
+      }, 20)
     },
-    computed: {
-      ...mapGetters([
-        'playHistory'
-      ])
+    hide () {
+      this.showFlag = false
     },
-    data() {
-      return {
-        showFlag: false,
-        // query: '',
-        showSinger: false,
-        currentIndex: 0,
-        switches: [
-          {
-            name: '最近播放'
-          },
-          {
-            name: '搜索历史'
-          }
-        ]
+    search (query) {
+      // 子组件传递过来的用户输入的query，再由父组件传递给另一个suggest组件
+      this.query = query
+    },
+    selectSuggest () {
+      // 点击搜索之后的列表单个内容，要保存搜索记录，并且显示tip
+      this.saveSearch()
+      this.showTopTip()
+    },
+    switchItem (index) {
+      this.currentIndex = index
+    },
+    selectSong (song, index) {
+      // console.log(song)
+      // 如果点击的是正在播放的歌曲，就不用往播放列表里面添加。如果点击不是正在播放的歌曲，因为当前的最近播放列表是从本地存储中读取的,是一个个字符串（对象），不是 所需的 Song 的事例，所以要把存储的song用Song类实例化一下，再添加到播放列表。添加完成之后，显示tip提示
+      if (index !== 0) {
+        this.insertSong(new Song(song))
+        this.showTopTip()
       }
     },
-    methods: {
-      show() {
-        this.showFlag = true;
-        // 由于add-song本身是隐藏的，但是scroll已经被初始化了。所以在add-song显示的时候，刷新scroll组件，不然不会滚动
-        setTimeout(() => {
-          if (this.currentIndex === 0) {
-            this.$refs.songlistwrapper.refresh();
-          } else {
-            this.$refs.searchlistwrapper.refresh();
-          }
-        }, 20)
-      },
-      hide() {
-        this.showFlag = false;
-      },
-      search(query) {
-        // 子组件传递过来的用户输入的query，再由父组件传递给另一个suggest组件
-        this.query = query;
-      },
-      selectSuggest() {
-        // 点击搜索之后的列表单个内容，要保存搜索记录，并且显示tip
-        this.saveSearch();
-        this.showTopTip();
-      },
-      switchItem(index) {
-        this.currentIndex = index;
-      },
-      selectSong(song, index) {
-        // console.log(song)
-        // 如果点击的是正在播放的歌曲，就不用往播放列表里面添加。如果点击不是正在播放的歌曲，因为当前的最近播放列表是从本地存储中读取的,是一个个字符串（对象），不是 所需的 Song 的事例，所以要把存储的song用Song类实例化一下，再添加到播放列表。添加完成之后，显示tip提示
-        if (index !== 0) {
-          this.insertSong(new Song(song));
-          this.showTopTip();
-        }
-      },
-      showTopTip() {
-        // 父组件调用子组件tip的显示方法
-        this.$refs.topTip.show();
-      },
-      ...mapActions([
-        'insertSong'
-      ])
-    }
+    showTopTip () {
+      // 父组件调用子组件tip的显示方法
+      this.$refs.topTip.show()
+    },
+    ...mapActions([
+      'insertSong'
+    ])
   }
+}
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">

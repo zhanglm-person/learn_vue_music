@@ -9,7 +9,7 @@
           <div class="hot-key">
             <h1 class="title">热门搜索</h1>
             <ul>
-              <li @click="addQuery(item.k)" class="item" v-for="(item,index) in hotKey">
+              <li @click="addQuery(item.k)" class="item" :key="index" v-for="(item, index) in hotKey">
                 <span>{{item.k}}</span>
               </li>
             </ul>
@@ -41,51 +41,51 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import Scroll from 'base/scroll/scroll'
-  import SearchBox from 'base/search-box/search-box'
-  import Suggest from 'components/suggest/suggest'
-  import SearchList from 'base/search-list/search-list'
-  import Confirm from 'base/confirm/confirm'
-  import {getHotKey} from 'api/search'
-  import {ERR_OK} from 'api/config'
-  import {mapActions} from 'vuex'
-  import {playlistMixin, searchMixin} from 'common/js/mixin'
+import Scroll from 'base/scroll/scroll'
+import SearchBox from 'base/search-box/search-box'
+import Suggest from 'components/suggest/suggest'
+import SearchList from 'base/search-list/search-list'
+import Confirm from 'base/confirm/confirm'
+import { getHotKey } from 'api/search'
+import { ERR_OK } from 'api/config'
+import { mapActions } from 'vuex'
+import { playlistMixin, searchMixin } from 'common/js/mixin'
 
-  export default {
-    mixins: [playlistMixin, searchMixin],
-    data() {
-      return {
-        hotKey: [],
-        //query: ''
-      }
-    },
-    computed: {
-      shortcut() {
-        return this.hotKey.concat(this.searchHistory)
-      },
-      /*...mapGetters([
+export default {
+  mixins: [playlistMixin, searchMixin],
+  data () {
+    return {
+      hotKey: []
+      // query: ''
+    }
+  },
+  computed: {
+    shortcut () {
+      return this.hotKey.concat(this.searchHistory)
+    }
+    /* ...mapGetters([
         'searchHistory'
-      ])*/
+      ]) */
+  },
+  created () {
+    this._getHotKey()
+  },
+  methods: {
+    handlePlaylist (playlist) {
+      const bottom = playlist.length > 0 ? '60px' : ''
+      this.$refs.searchResult.style.bottom = bottom
+      this.$refs.shortcutWrapper.style.bottom = bottom
+      this.$refs.suggest.refresh()
+      this.$refs.shortcut.refresh()
     },
-    created() {
-      this._getHotKey();
-    },
-    methods: {
-      handlePlaylist(playlist) {
-        const bottom = playlist.length > 0 ? '60px' : '';
-        this.$refs.searchResult.style.bottom = bottom;
-        this.$refs.shortcutWrapper.style.bottom = bottom;
-        this.$refs.suggest.refresh();
-        this.$refs.shortcut.refresh();
-      },
-      /*deleteOne(query) {
+    /* deleteOne(query) {
         this.deleteSearchHistory(query);
-      },*/
-      deleteAll() {
-        this.$refs.confirm.show();
-        // this.clearSearchHistory();
-      },
-      /*onQueryChange(query) {
+      }, */
+    deleteAll () {
+      this.$refs.confirm.show()
+      // this.clearSearchHistory();
+    },
+    /* onQueryChange(query) {
         // 输入框的内容改变，父组件传给suggest的query也要改变
         this.query = query;
       },
@@ -100,38 +100,38 @@
       saveSearch() {
         // 监听到列表的点击事件 保存当前的搜索内容
         this.saveSearchHistory(this.query)
-      },*/
-      _getHotKey() {
-        getHotKey().then((rsp) => {
-          if (rsp.code === ERR_OK) {
-            //console.log(rsp);
-            this.hotKey = rsp.data.hotkey.slice(0, 10);
-          }
-        })
-      },
-      ...mapActions([
-        //'saveSearchHistory',
-        //'deleteSearchHistory',
-        'clearSearchHistory'
-      ])
-    },
-    watch: {
-      query(newQuery) {
-        if (!newQuery) {
-          setTimeout(() => {
-            this.$refs.shortcut.refresh();
-          }, 20)
+      }, */
+    _getHotKey () {
+      getHotKey().then((rsp) => {
+        if (rsp.code === ERR_OK) {
+          // console.log(rsp);
+          this.hotKey = rsp.data.hotkey.slice(0, 10)
         }
-      }
+      })
     },
-    components: {
-      SearchBox,
-      Suggest,
-      SearchList,
-      Confirm,
-      Scroll
+    ...mapActions([
+      // 'saveSearchHistory',
+      // 'deleteSearchHistory',
+      'clearSearchHistory'
+    ])
+  },
+  watch: {
+    query (newQuery) {
+      if (!newQuery) {
+        setTimeout(() => {
+          this.$refs.shortcut.refresh()
+        }, 20)
+      }
     }
+  },
+  components: {
+    SearchBox,
+    Suggest,
+    SearchList,
+    Confirm,
+    Scroll
   }
+}
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">

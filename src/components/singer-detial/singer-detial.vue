@@ -7,63 +7,51 @@
 
 <script type="text/ecmascript-6">
 
-  import MusicList from 'components/music-list/music-list'
-  import {getSingerDetial} from 'api/singer'
-  import {ERR_OK} from 'api/config'
-  import {createSong} from 'common/js/song'
-  import {mapGetters} from 'vuex'
+import MusicList from 'components/music-list/music-list'
+import { getSingerDetial } from 'api/singer'
+import { ERR_OK } from 'api/config'
+import { processSongsUrl, normalizeSongs } from 'common/js/song'
+import { mapGetters } from 'vuex'
 
-  export default {
-    computed: {
-      title() {
-        return this.singer.name
-      },
-      bgImage() {
-        return this.singer.avatar
-      },
-      ...mapGetters([
-        'singer'
-      ])
+export default {
+  computed: {
+    title () {
+      return this.singer.name
     },
-    data() {
-      return {
-        songs: []
-      }
+    bgImage () {
+      return this.singer.avatar
     },
-    created() {
-      this._getDetail()
-    },
-    methods: {
-      _getDetail() {
-        if (!this.singer.id) {
-          this.$router.push('/singer');
-          return
-        }
-        getSingerDetial(this.singer.id).then((res) => {
-          if (res.code === ERR_OK) {
-            // 在歌手详情页面得到的songs列表，要传入两层到song-list组件遍历。
-            this.songs = this._normalizeSongs(res.data.list)
-            // console.log(this.songs)
-          }
-        })
-      },
-      _normalizeSongs(list) {
-        let ret = [];
-        list.forEach((item) => {
-          //let {musicData} = item          es6 对象结构赋值
-          let musicData = item.musicData;
-          if (musicData.songid && musicData.albummid) {
-            //根据工厂方法 创建一个song,只有是Song的事例才可以点击播放，并且添加到vuex管理
-            ret.push(createSong(musicData))
-          }
-        });
-        return ret
-      }
-    },
-    components: {
-      MusicList
+    ...mapGetters([
+      'singer'
+    ])
+  },
+  data () {
+    return {
+      songs: []
     }
+  },
+  created () {
+    this._getDetail()
+  },
+  methods: {
+    _getDetail () {
+      if (!this.singer.id) {
+        this.$router.push('/singer')
+        return
+      }
+      getSingerDetial(this.singer.id).then((res) => {
+        if (res.code === ERR_OK) {
+          processSongsUrl(normalizeSongs(res.data.list)).then(songs => {
+            this.songs = songs
+          })
+        }
+      })
+    }
+  },
+  components: {
+    MusicList
   }
+}
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" scoped>

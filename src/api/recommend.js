@@ -1,21 +1,25 @@
 import jsonp from 'common/js/jsonp'
-import {commonParams, options} from './config'
+import { commonParams, options } from './config'
 import axios from 'axios'
 
-export function getRecommend() {
-  const url = 'https://c.y.qq.com/musichall/fcgi-bin/fcg_yqqhomepagerecommend.fcg';
+const debug = process.env.NODE_ENV !== 'production'
+
+export function getRecommend () {
+  const url = 'https://c.y.qq.com/musichall/fcgi-bin/fcg_yqqhomepagerecommend.fcg'
 
   const data = Object.assign({}, commonParams, {
     platform: 'h5',
     uin: 0,
     needNewCode: 1
-  });
+  })
 
-  return jsonp(url, data, options);
+  return jsonp(url, data, options)
 }
 
-export function getDiscList() {
-  const url = '/api/getDiscList';
+export function getDiscList () {
+  const url = debug
+    ? '/api/getDiscList'
+    : 'http://127.0.0.1:7729/api/getDiscList'
 
   const data = Object.assign({}, commonParams, {
     platform: 'yqq',
@@ -26,18 +30,20 @@ export function getDiscList() {
     needNewCode: 0,
     categoryId: 10000000,
     rnd: Math.random(),
-    format: 'json'    // 需要修改format,不然是jsonp
-  });
+    format: 'json' // 需要修改format,不然是jsonp
+  })
 
   return axios.get(url, {
     params: data
   }).then((rsp) => {
     return Promise.resolve(rsp.data)
-  });
+  })
 }
 
-export function getSongList(disstid) {
-  const url = 'https://c.y.qq.com/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg';
+export function getSongList (disstid) {
+  const url = debug
+    ? '/api/getCdInfo/'
+    : 'http://127.0.0.1:7729/api/getCdInfo'
 
   const data = Object.assign({}, commonParams, {
     disstid: disstid,
@@ -48,7 +54,13 @@ export function getSongList(disstid) {
     platform: 'yqq',
     hostUin: 0,
     needNewCode: 0
-  });
+  })
 
-  return jsonp(url, data, options);
+  return axios
+    .get(url, {
+      params: data
+    })
+    .then(res => {
+      return Promise.resolve(res.data)
+    })
 }

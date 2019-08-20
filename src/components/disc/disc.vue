@@ -5,60 +5,54 @@
 </template>
 
 <script type='text/ecmascript-6'>
-  import MusicList from 'components/music-list/music-list'
-  import {mapGetters} from 'vuex'
-  import {getSongList} from 'api/recommend'
-  import {ERR_OK} from 'api/config'
-  import {createSong} from 'common/js/song'
-  export default{
-    computed: {
-      title(){
-        return this.disc.dissname
-      },
-      bgImg(){
-        return this.disc.imgurl
-      },
-      ...mapGetters([
-        'disc'
-      ])
+import MusicList from 'components/music-list/music-list'
+import { mapGetters } from 'vuex'
+import { getSongList } from 'api/recommend'
+import { ERR_OK } from 'api/config'
+import { processSongsUrl, normalizeSongs } from 'common/js/song'
+export default {
+  computed: {
+    title () {
+      return this.disc.dissname
     },
-    data(){
-      return {
-        songs: []
+    bgImg () {
+      return this.disc.imgurl
+    },
+    ...mapGetters([
+      'disc'
+    ])
+  },
+  data () {
+    return {
+      songs: []
+    }
+  },
+  created () {
+    this._getSongList()
+  },
+  methods: {
+    _getSongList () {
+      if (!this.disc.dissid) {
+        this.$router.push('/recommend')
+        return
       }
-    },
-    created(){
-      this._getSongList();
-    },
-    methods: {
-      _getSongList(){
-        if (!this.disc.dissid) {
-          this.$router.push('/recommend');
-          return
+      getSongList(this.disc.dissid).then((rsp) => {
+        if (rsp.code === ERR_OK) {
+          processSongsUrl(normalizeSongs(rsp.cdlist[0].songlist)).then(
+            songs => {
+              this.songs = songs
+            }
+          )
         }
-        // QQ接口更改了返回的jsonp，无法取到数据
-        getSongList(this.disc.dissid).then((rsp) => {
-          if (rsp.code === ERR_OK) {
-            this.songs = this._normalizeSongs(rsp.cdlist[0].songlist);
-          }
-        }).catch((e) => {
-          console.log(e);
-        })
-      },
-      _normalizeSongs(list){
-        let ret = [];
-        list.forEach((item) => {
-          if (item.songid && item.albummid) {
-            ret.push(createSong(item));
-          }
-        });
-        return ret;
-      }
-    },
-    components: {
-      MusicList
-    },
+      }).catch((e) => {
+        console.log(e)
+      })
+    }
+  },
+  components: {
+    MusicList
   }
+}
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" scoped>

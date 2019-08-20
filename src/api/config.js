@@ -4,10 +4,12 @@ export const commonParams = {
   outCharset: 'utf-8',
   notice: 0,
   format: 'jsonp'
-};
+}
 
+// jsonp参数选项
 export const options = {
-  param: 'jsonpCallback'
-};
+  param: 'jsonpCallback',
+  prefix: 'jp'
+}
 
-export const ERR_OK = 0;
+export const ERR_OK = 0

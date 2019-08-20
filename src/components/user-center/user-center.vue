@@ -35,89 +35,89 @@
 </template>
 
 <script type='text/ecmascript-6'>
-  import Switches from 'base/switches/switches'
-  import Scroll from 'base/scroll/scroll'
-  import SongList from 'base/song-list/song-list'
-  import {mapGetters, mapActions} from 'vuex'
-  import Song from 'common/js/song'
-  import {playlistMixin} from 'common/js/mixin'
-  import NoResult from 'base/no-result/no-result'
+import Switches from 'base/switches/switches'
+import Scroll from 'base/scroll/scroll'
+import SongList from 'base/song-list/song-list'
+import { mapGetters, mapActions } from 'vuex'
+import Song from 'common/js/song'
+import { playlistMixin } from 'common/js/mixin'
+import NoResult from 'base/no-result/no-result'
 
-  export default {
-    mixins: [playlistMixin],
-    data() {
-      return {
-        switches: [
-          {
-            name: '我喜欢的'
-          },
-          {
-            name: '最近听的'
-          }
-        ],
-        currentIndex: 0
+export default {
+  mixins: [playlistMixin],
+  data () {
+    return {
+      switches: [
+        {
+          name: '我喜欢的'
+        },
+        {
+          name: '最近听的'
+        }
+      ],
+      currentIndex: 0
+    }
+  },
+  computed: {
+    noResult () {
+      if (this.currentIndex === 0) {
+        return !this.favoriteList.length
+      } else {
+        return !this.playHistory.length
       }
     },
-    computed: {
-      noResult() {
-        if (this.currentIndex === 0) {
-          return !this.favoriteList.length;
-        } else {
-          return !this.playHistory.length;
-        }
-      },
-      noResultTitle() {
-        if (this.currentIndex === 0) {
-          return '暂无收藏~'
-        } else {
-          return '还未听过歌曲~'
-        }
-      },
-      ...mapGetters([
-        'favoriteList',
-        'playHistory'
-      ])
+    noResultTitle () {
+      if (this.currentIndex === 0) {
+        return '暂无收藏~'
+      } else {
+        return '还未听过歌曲~'
+      }
     },
-    methods: {
-      handlePlaylist(playlist) {
-        const bottom = playlist.length ? '60px' : '';
-        this.$refs.listWrapper.style.bottom = bottom;
-        this.$refs.favoritelistWrapper && this.$refs.favoritelistWrapper.refresh();
-        this.$refs.playlistWrapper && this.$refs.playlistWrapper.refresh();
-      },
-      back() {
-        this.$router.back();
-      },
-      switchItem(index) {
-        this.currentIndex = index;
-      },
-      selectSong(song) {
-        this.insertSong(new Song(song));
-      },
-      random() {
-        let list = this.currentIndex === 0 ? this.favoriteList : this.playHistory;
-        if (list.length === 0) {
-          return;
-        }
-        list = list.map((song) => {
-          return new Song(song);
-        });
-        this.randomPlay({
-          list
-        })
-      },
-      ...mapActions([
-        'insertSong',
-        'randomPlay'
-      ])
+    ...mapGetters([
+      'favoriteList',
+      'playHistory'
+    ])
+  },
+  methods: {
+    handlePlaylist (playlist) {
+      const bottom = playlist.length ? '60px' : ''
+      this.$refs.listWrapper.style.bottom = bottom
+      this.$refs.favoritelistWrapper && this.$refs.favoritelistWrapper.refresh()
+      this.$refs.playlistWrapper && this.$refs.playlistWrapper.refresh()
     },
-    components: {
-      Switches,
-      SongList,
-      Scroll,
-      NoResult
-    }
+    back () {
+      this.$router.back()
+    },
+    switchItem (index) {
+      this.currentIndex = index
+    },
+    selectSong (song) {
+      this.insertSong(new Song(song))
+    },
+    random () {
+      let list = this.currentIndex === 0 ? this.favoriteList : this.playHistory
+      if (list.length === 0) {
+        return
+      }
+      list = list.map((song) => {
+        return new Song(song)
+      })
+      this.randomPlay({
+        list
+      })
+    },
+    ...mapActions([
+      'insertSong',
+      'randomPlay'
+    ])
+  },
+  components: {
+    Switches,
+    SongList,
+    Scroll,
+    NoResult
   }
+}
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">

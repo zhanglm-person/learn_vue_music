@@ -7,38 +7,38 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import {debounce} from 'common/js/util'
+import { debounce } from 'common/js/util'
 
-  export default {
-    props: {
-      placeHolder: {
-        type: String,
-        default: "搜索歌曲、歌手"
-      }
-    },
-    data() {
-      return {
-        query: ''
-      }
-    },
-    methods: {
-      clear() {
-        this.query = '';
-      },
-      setQuery(query) {
-        this.query = query;
-      },
-      blur(){
-        this.$refs.query.blur();
-      }
-    },
-    created() {
-      // 去抖函数，减少输入查询次数，降低服务器压力
-      this.$watch('query', debounce((newQuery) => {
-        this.$emit('query', newQuery);
-      }, 200))
+export default {
+  props: {
+    placeHolder: {
+      type: String,
+      default: '搜索歌曲、歌手'
     }
+  },
+  data () {
+    return {
+      query: ''
+    }
+  },
+  methods: {
+    clear () {
+      this.query = ''
+    },
+    setQuery (query) {
+      this.query = query
+    },
+    blur () {
+      this.$refs.query.blur()
+    }
+  },
+  created () {
+    // 去抖函数，减少输入查询次数，降低服务器压力
+    this.$watch('query', debounce((newQuery) => {
+      this.$emit('query', newQuery)
+    }, 200))
   }
+}
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" scoped>

@@ -5,12 +5,11 @@ import * as getters from './getters'
 import state from './state'
 import mutations from './mutations'
 
-
-import createLoger from 'vuex/dist/logger'    //日志插件
+import createLoger from 'vuex/dist/logger' // 日志插件
 
 Vue.use(Vuex)
 
-const debug = process.env.NODE_ENV !== "production"
+const debug = process.env.NODE_ENV !== 'production'
 
 export default new Vuex.Store({
   actions,

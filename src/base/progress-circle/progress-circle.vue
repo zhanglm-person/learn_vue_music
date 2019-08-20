@@ -16,29 +16,29 @@
 </template>
 
 <script type="text/ecmascript-6">
-  export default{
-    props:{
-      radius:{
-        type:Number,
-        default:100
-      },
-      percent:{
-        type:Number,
-        default:0
-      }
+export default {
+  props: {
+    radius: {
+      type: Number,
+      default: 100
     },
-    data() {
-      return {
-        dashArray: Math.PI * 100  // dashArray 表示周长
-      }
-    },
-    computed: {
-      dashOffset() {
-        // 偏移量满周长的话 是没有显示外层的圆的 就是没有进度！
-        return (1 - this.percent) * this.dashArray  // 当前圆周上的的偏移量
-      }
+    percent: {
+      type: Number,
+      default: 0
+    }
+  },
+  data () {
+    return {
+      dashArray: Math.PI * 100 // dashArray 表示周长
+    }
+  },
+  computed: {
+    dashOffset () {
+      // 偏移量满周长的话 是没有显示外层的圆的 就是没有进度！
+      return (1 - this.percent) * this.dashArray // 当前圆周上的的偏移量
     }
   }
+}
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">

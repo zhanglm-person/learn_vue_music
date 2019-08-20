@@ -7,31 +7,31 @@
 </template>
 
 <script type='text/ecmascript-6'>
-  export default {
-    props: {
-      delay: {
-        type: Number,
-        default: 2000
-      }
+export default {
+  props: {
+    delay: {
+      type: Number,
+      default: 2000
+    }
+  },
+  data () {
+    return {
+      showFlag: false
+    }
+  },
+  methods: {
+    hide () {
+      this.showFlag = false
     },
-    data() {
-      return {
-        showFlag: false
-      }
-    },
-    methods: {
-      hide() {
-        this.showFlag = false;
-      },
-      show() {
-        this.showFlag = true;
-        clearTimeout(this.timer);
-        this.timer = setTimeout(() => {
-          this.hide()
-        }, this.delay)
-      }
+    show () {
+      this.showFlag = true
+      clearTimeout(this.timer)
+      this.timer = setTimeout(() => {
+        this.hide()
+      }, this.delay)
     }
   }
+}
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">

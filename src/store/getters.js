@@ -1,4 +1,4 @@
-/*export const state = state => state*/
+/* export const state = state => state */
 
 export const singer = state => state.singer
 

@@ -6,14 +6,14 @@
 </template>
 
 <script type="text/ecmascript-6">
-  export default{
-    props: {
-      title: {
-        type: String,
-        default: "正在加载...."
-      }
+export default {
+  props: {
+    title: {
+      type: String,
+      default: '正在加载....'
     }
   }
+}
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">

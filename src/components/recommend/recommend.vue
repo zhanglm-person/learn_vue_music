@@ -4,7 +4,7 @@
       <div>
         <div v-if="recommends.length" class="silder-wrapper" ref="silderWrapper">
           <slider>
-            <div class="slider-item" v-for="(item,index) in recommends">
+            <div class="slider-item" v-for="(item, index) in recommends" :key="index">
               <a :href="item.linkUrl">
                 <img class="needsclick" @load="loadImg" :src="item.picUrl" alt="">
               </a>
@@ -35,72 +35,72 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import Slider from 'base/slider/slider'
-  import Scroll from 'base/scroll/scroll'
-  import Loading from 'base/loading/loading'
-  import {playlistMixin} from 'common/js/mixin'
-  import {getRecommend, getDiscList} from 'api/recommend'
-  import {ERR_OK} from 'api/config'
+import Slider from 'base/slider/slider'
+import Scroll from 'base/scroll/scroll'
+import Loading from 'base/loading/loading'
+import { playlistMixin } from 'common/js/mixin'
+import { getRecommend, getDiscList } from 'api/recommend'
+import { ERR_OK } from 'api/config'
 
-  import {mapMutations} from 'vuex'
+import { mapMutations } from 'vuex'
 
-  export default {
-    mixins: [playlistMixin],
-    components: {
-      Slider,
-      Scroll,
-      Loading
+export default {
+  mixins: [playlistMixin],
+  components: {
+    Slider,
+    Scroll,
+    Loading
+  },
+  data () {
+    return {
+      recommends: [],
+      discList: []
+    }
+  },
+  created () {
+    this._getRecommend()
+    this._getDiscList()
+  },
+  methods: {
+    selectItem (item, index) {
+      this.$router.push({
+        path: '/recommend/' + item.dissid
+      })
+      this.setDisc(item)
     },
-    data() {
-      return {
-        recommends: [],
-        discList: []
+    handlePlaylist (playlist) {
+      const bottom = playlist.length > 0 ? '60px' : ''
+      this.$refs.recommend.style.bottom = bottom
+      this.$refs.scroll.refresh()
+    },
+    _getRecommend () {
+      getRecommend().then((rsp) => {
+        if (rsp.code === ERR_OK) {
+          // console.log(rsp.data.slider);
+          this.recommends = rsp.data.slider
+          // 异步获取数据，要保证获取到数据之后才能进对数据元素的操作，所以要给轮播图组件的容器加上v-if，防止数据没有获取到就进行了，slider组件的初始化操作。
+        }
+      })
+    },
+    _getDiscList () {
+      getDiscList().then((rsp) => {
+        if (rsp.code === ERR_OK) {
+          // console.log(rsp.data.list);
+          this.discList = rsp.data.list
+        }
+      })
+    },
+    loadImg () {
+      if (!this.checkLoaded) {
+        this.checkLoaded = true
+        this.$refs.scroll.refresh()
       }
     },
-    created() {
-      this._getRecommend();
-      this._getDiscList();
-    },
-    methods: {
-      selectItem(item, index) {
-        this.$router.push({
-          path: '/recommend/' + item.dissid
-        });
-        this.setDisc(item);
-      },
-      handlePlaylist(playlist) {
-        const bottom = playlist.length > 0 ? '60px' : '';
-        this.$refs.recommend.style.bottom = bottom;
-        this.$refs.scroll.refresh();
-      },
-      _getRecommend() {
-        getRecommend().then((rsp) => {
-          if (rsp.code === ERR_OK) {
-            //console.log(rsp.data.slider);
-            this.recommends = rsp.data.slider;
-            // 异步获取数据，要保证获取到数据之后才能进对数据元素的操作，所以要给轮播图组件的容器加上v-if，防止数据没有获取到就进行了，slider组件的初始化操作。
-          }
-        })
-      },
-      _getDiscList() {
-        getDiscList().then((rsp) => {
-          if (rsp.code === ERR_OK) {
-            //console.log(rsp.data.list);
-            this.discList = rsp.data.list;
-          }
-        })
-      },
-      loadImg() {
-        if (!this.checkLoaded) {
-          this.checkLoaded = true;
-          this.$refs.scroll.refresh();
-        }
-      },
-      ...mapMutations({
-        setDisc: "SET_DISC"
-      })
-    }
+    ...mapMutations({
+      setDisc: 'SET_DISC'
+    })
   }
+}
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">

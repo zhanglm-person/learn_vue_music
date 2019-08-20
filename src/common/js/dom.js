@@ -1,11 +1,11 @@
-export function hasClass(el, className) {
+export function hasClass (el, className) {
   // (^|\\s) -> 开头 或者 是前面有空白字符
   // (\\s|$) -> 后面是空白字符 或者 直接结尾
   let reg = new RegExp('(^|\\s)' + className + '(\\s|$)')
   return reg.test(el.className)
 }
 
-export function addClass(el, className) {
+export function addClass (el, className) {
   if (hasClass(el, className)) {
     return
   }
@@ -15,7 +15,7 @@ export function addClass(el, className) {
   el.className = newClass.join(' ')
 }
 
-export function getData(el, name, val) {
+export function getData (el, name, val) {
   const prefix = 'data-'
   if (val) {
     return el.setAttribute(prefix + name, val)
@@ -41,9 +41,9 @@ let vendor = (() => {
     }
   }
   return false
-})();
+})()
 
-export function prefixStyle(style) {
+export function prefixStyle (style) {
   if (vendor === false) {
     return false
   }
