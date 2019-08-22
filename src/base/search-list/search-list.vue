@@ -11,27 +11,27 @@
   </div>
 </template>
 
-<script type="text/ecmascript-6">
-export default {
-  props: {
-    searches: {
-      type: Array,
-      default: () => []
-    }
-  },
-  methods: {
-    selectItem (item) {
-      this.$emit('select', item)
-    },
-    deleteOne (item) {
-      this.$emit('delete', item)
-    }
+<script lang="ts">
+import { Vue, Component, Prop, Emit } from 'vue-property-decorator'
+
+@Component
+export default class SearchList extends Vue {
+  @Prop({ default: () => [], type: Array }) public searches!: string[]
+
+  @Emit('select')
+  public selectItem(item: string) {
+    return item
+  }
+
+  @Emit('delete')
+  public deleteOne(item: string) {
+    return item
   }
 }
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" scoped>
-  @import "~common/stylus/variable"
+  @import "~@/common/stylus/variable"
 
   .search-list
     .search-item

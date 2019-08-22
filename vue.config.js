@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 
 module.exports = {
   devServer: {
+    port: 7777,
     before (app) {
       app.get('/api/getDiscList', (req, res) => {
         const url =
@@ -102,13 +103,13 @@ module.exports = {
   configureWebpack: {
     resolve: {
       mainFields: ['browser', 'module', 'main', 'index'],
-      extensions: ['.js', '.vue', '.json'],
+      extensions: ['.js', '.vue', '.json', '.ts'],
       alias: {
         '@': resolve('src'),
-        'components': resolve('src/components'),
-        'base': resolve('src/base'),
-        'api': resolve('src/api'),
-        'common': resolve('src/common')
+        '@/components': resolve('src/components'),
+        '@/base': resolve('src/base'),
+        '@/api': resolve('src/api'),
+        '@/common': resolve('src/common')
       }
     }
   }

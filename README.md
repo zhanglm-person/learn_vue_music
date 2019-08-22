@@ -1,5 +1,4 @@
 # vue-study-music
-vue 进阶的一个练习
 
 ## Project setup
 ```

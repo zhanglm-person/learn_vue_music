@@ -5,20 +5,18 @@
   </div>
 </template>
 
-<script type="text/ecmascript-6">
-export default {
-  props: {
-    title: {
-      type: String,
-      default: ''
-    }
-  }
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator'
+
+@Component
+export default class NoResult extends Vue {
+  @Prop({default: '', type: String}) public title!: string
 }
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" scoped>
-  @import "~common/stylus/variable"
-  @import "~common/stylus/mixin"
+  @import "~@/common/stylus/variable"
+  @import "~@/common/stylus/mixin"
 
   .no-result
     text-align: center

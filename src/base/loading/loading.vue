@@ -5,19 +5,17 @@
   </div>
 </template>
 
-<script type="text/ecmascript-6">
-export default {
-  props: {
-    title: {
-      type: String,
-      default: '正在加载....'
-    }
-  }
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator'
+
+@Component
+export default class Loading extends Vue {
+  @Prop({default: '正在加载...', type: String}) public title!: string
 }
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">
-  @import "~common/stylus/variable"
+  @import "~@/common/stylus/variable"
 
   .loading
     width 100%

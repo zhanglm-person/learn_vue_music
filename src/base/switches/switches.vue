@@ -7,28 +7,23 @@
   </ul>
 </template>
 
-<script type='text/ecmascript-6'>
-export default {
-  props: {
-    switches: {
-      type: Array,
-      default: () => []
-    },
-    currentIndex: {
-      type: Number,
-      default: 0
-    }
-  },
-  methods: {
-    switchItem (index) {
-      this.$emit('switch', index)
-    }
+<script lang="ts">
+import { Vue, Component, Prop, Emit } from 'vue-property-decorator'
+
+@Component
+export default class Switches extends Vue {
+  @Prop({ default: () => [], type: Array }) public switches!: object[]
+  @Prop({ default: 0, type: Number }) public currentIndex!: number
+
+  @Emit('switch')
+  public switchItem(index: number) {
+    return index
   }
 }
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
-  @import "~common/stylus/variable"
+  @import "~@/common/stylus/variable"
 
   .switches
     display: flex

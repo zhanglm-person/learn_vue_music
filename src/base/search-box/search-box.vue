@@ -6,43 +6,46 @@
   </div>
 </template>
 
-<script type="text/ecmascript-6">
-import { debounce } from 'common/js/util'
+<script lang="ts">
+import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator'
 
-export default {
-  props: {
-    placeHolder: {
-      type: String,
-      default: '搜索歌曲、歌手'
-    }
-  },
-  data () {
-    return {
-      query: ''
-    }
-  },
-  methods: {
-    clear () {
-      this.query = ''
-    },
-    setQuery (query) {
-      this.query = query
-    },
-    blur () {
-      this.$refs.query.blur()
-    }
-  },
-  created () {
-    // 去抖函数，减少输入查询次数，降低服务器压力
-    this.$watch('query', debounce((newQuery) => {
-      this.$emit('query', newQuery)
-    }, 200))
+@Component({
+  name: 'SearchBox',
+})
+export default class SearchBox extends Vue {
+  @Prop({default: '搜索歌曲、歌手', type: String}) public placeHolder!: string
+
+  public query: string = ''
+  public $refs!: {
+    query: HTMLInputElement,
+  }
+
+  public clear(): void {
+    this.query = ''
+  }
+
+  public setQuery(query: string): void {
+    this.query = query
+  }
+
+  /**
+   * 在滚动之前，隐藏手机端的输入键盘
+   * 只有在手机端才有效
+   */
+  public blur(): void {
+    this.$refs.query.blur()
+  }
+
+  @Emit('query')
+  @Watch('query')
+  public onQueryChange(newQuery: string) {
+    // this.$emit('query', newQuery)
   }
 }
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" scoped>
-  @import "~common/stylus/variable"
+  @import "~@/common/stylus/variable"
 
   .search-box
     display: flex

@@ -14,48 +14,39 @@
   </transition>
 </template>
 
-<script type='text/ecmascript-6'>
-export default {
-  props: {
-    text: {
-      type: String,
-      default: ''
-    },
-    confirmBtnText: {
-      type: String,
-      default: '确定'
-    },
-    cancelBtnText: {
-      type: String,
-      default: '取消'
-    }
-  },
-  data () {
-    return {
-      showFlag: false
-    }
-  },
-  methods: {
-    show () {
-      this.showFlag = true
-    },
-    hide () {
-      this.showFlag = false
-    },
-    cancel () {
-      this.hide()
-      this.$emit('cancel')
-    },
-    confirm () {
-      this.hide()
-      this.$emit('confirm')
-    }
+<script lang="ts">
+import { Component, Prop, Vue, Emit } from 'vue-property-decorator'
+
+@Component({})
+export default class Confirm extends Vue {
+  @Prop({ default: '', type: String }) public text!: string
+  @Prop({ default: '确定', type: String }) public confirmBtnText!: string
+  @Prop({ default: '取消', type: String }) public cancelBtnText!: string
+
+  public showFlag: boolean = false
+
+  public show() {
+    this.showFlag = true
+  }
+
+  public hide() {
+    this.showFlag = false
+  }
+
+  @Emit()
+  public cancel() {
+    this.hide()
+  }
+
+  @Emit()
+  public confirm() {
+    this.hide()
   }
 }
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
-  @import "~common/stylus/variable"
+  @import "~@/common/stylus/variable"
 
   .confirm
     position: fixed

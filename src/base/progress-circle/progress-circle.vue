@@ -15,34 +15,25 @@
   </div>
 </template>
 
-<script type="text/ecmascript-6">
-export default {
-  props: {
-    radius: {
-      type: Number,
-      default: 100
-    },
-    percent: {
-      type: Number,
-      default: 0
-    }
-  },
-  data () {
-    return {
-      dashArray: Math.PI * 100 // dashArray 表示周长
-    }
-  },
-  computed: {
-    dashOffset () {
-      // 偏移量满周长的话 是没有显示外层的圆的 就是没有进度！
-      return (1 - this.percent) * this.dashArray // 当前圆周上的的偏移量
-    }
+<script lang="ts">
+import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator'
+
+@Component
+export default class ProgressCircle extends Vue {
+  @Prop({ default: 100, type: Number }) public readonly radius!: number
+  @Prop({ default: 0, type: Number }) public readonly percent!: number
+
+  public dashArray: number = Math.PI * 100 // dashArray 表示周长
+
+  get dashOffset(): number {
+    // 偏移量满周长的话 是没有显示外层的圆的 就是没有进度！
+    return (1 - this.percent) * this.dashArray // 当前圆周上的的偏移量
   }
 }
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">
-  @import "~common/stylus/variable"
+  @import "~@/common/stylus/variable"
 
   .progress-circle
     position: relative

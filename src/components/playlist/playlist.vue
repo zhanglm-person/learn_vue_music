@@ -47,114 +47,117 @@
   </transition>
 </template>
 
-<script type='text/ecmascript-6'>
-import { mapActions } from 'vuex'
-import Scroll from 'base/scroll/scroll'
-import { playMode } from 'common/js/config'
-import Confirm from 'base/confirm/confirm'
-import { playerMixin } from 'common/js/mixin'
-import AddSong from 'components/add-song/add-song'
+<script lang="ts">
+import { Vue, Component, Mixins, Prop, Watch } from 'vue-property-decorator'
+import { Action } from 'vuex-class'
+import { playMode } from '@/common/js/config'
+import { PlayerMixin } from '@/common/js/mixin'
+import Scroll from '@/base/scroll/scroll.vue'
+import Confirm from '@/base/confirm/confirm.vue'
+import AddSong from '@/components/add-song/add-song.vue'
+import Song from '@/common/js/song'
 
-export default {
-  mixins: [playerMixin],
+@Component({
   components: {
     Scroll,
     Confirm,
-    AddSong
+    AddSong,
   },
-  data () {
-    return {
-      showFlag: false,
-      refreshDelay: 120 // 这里设置refreshDelay，是因为避免用户操作动画之后，scroll组件刷新已经完成。所以延长scroll组件监听到data变化后的刷新时间。
+})
+export default class PlayList extends Mixins(PlayerMixin) {
+  public showFlag: boolean = false
+  // 这里设置refreshDelay，是因为避免用户操作动画之后，scroll组件刷新已经完成。所以延长scroll组件监听到data变化后的刷新时间。
+  public refreshDelay: number = 120
+
+  public $refs!: {
+    addSong: AddSong
+    confirm: Confirm
+    listContent: Scroll,
+    listItem: HTMLLIElement[],
+  }
+
+  @Action public deleteSong!: (song: Song) => void
+  @Action public deleteSongList!: () => void
+
+
+  get modeText(): string {
+    return this.mode === playMode.sequence ? '顺序播放' : this.mode === playMode.random ? '随机播放' : '单曲循环'
+  }
+
+  public addSong() {
+    this.$refs.addSong.show()
+  }
+
+  public showConfirm() {
+    this.$refs.confirm.show()
+  }
+
+  public confirmClear() {
+    // 点击清空删除所有歌曲
+    this.deleteSongList()
+    this.hide()
+  }
+
+  public show() {
+    this.showFlag = true
+    setTimeout(() => {
+      this.$refs.listContent.refresh()
+      this.scrollToCurrent(this.currentSong)// 滚动到当前播放的歌曲位置
+    }, 20)
+  }
+
+  public hide() {
+    this.showFlag = false
+  }
+
+  public getCurrentIcon(item: Song) {
+    // 当前播放歌曲的icon
+    if (item.id === this.currentSong.id) {
+      return 'icon-play'
+    } else {
+      return ''
     }
-  },
-  computed: {
-    modeText () {
-      return this.mode === playMode.sequence ? '顺序播放' : this.mode === playMode.random ? '随机播放' : '单曲循环'
-    }
-    /* ...mapGetters([
-        'sequencelist',
-        'currentSong',
-        'mode',
-        'playlist'
-      ]) */
-  },
-  methods: {
-    addSong () {
-      this.$refs.addSong.show()
-    },
-    showConfirm () {
-      this.$refs.confirm.show()
-    },
-    confirmClear () {
-      // 点击清空删除所有歌曲
-      this.deleteSongList()
-      this.hide()
-    },
-    show () {
-      this.showFlag = true
-      setTimeout(() => {
-        this.$refs.listContent.refresh()
-        this.scrollToCurrent(this.currentSong)// 滚动到当前播放的歌曲位置
-      }, 20)
-    },
-    hide () {
-      this.showFlag = false
-    },
-    getCurrentIcon (item) {
-      // 当前播放歌曲的icon
-      if (item.id === this.currentSong.id) {
-        return 'icon-play'
-      } else {
-        return ''
-      }
-    },
-    selectItem (item, index) {
-      // 如果是随机播放，就要找到当前歌曲在播放列表的位置index，设置currentIndex
-      if (this.mode === playMode.random) {
-        index = this.playlist.findIndex((song) => {
-          return song.id === item.id
-        })
-      }
-      this.setCurrentIndex(index)
-      this.setPlayingState(true)
-    },
-    scrollToCurrent (current) {
-      const index = this.sequencelist.findIndex((song) => {
-        return song.id === current.id
+  }
+
+  public selectItem(item: Song, index: number) {
+    // 如果是随机播放，就要找到当前歌曲在播放列表的位置index，设置currentIndex
+    if (this.mode === playMode.random) {
+      index = this.playlist.findIndex((song) => {
+        return song.id === item.id
       })
-      this.$refs.listContent.scrollToElement(this.$refs.listItem[index], 300)
-    },
-    deleteOne (item) {
-      this.deleteSong(item)
-      // 删除歌曲之后，判断时候还有歌曲。没有就隐藏掉playlist，防止再次添加歌曲，player父组件的展示引起playlist的展示。
-      if (!this.playlist.length) {
-        this.hide()
-      }
-    },
-    /* ...mapMutations({
-        setCurrentIndex: 'SET_CURRENTINDEX',
-        setPlayingState: 'SET_PLAYING_STATE'
-      }), */
-    ...mapActions([
-      'deleteSong',
-      'deleteSongList'
-    ])
-  },
-  watch: {
-    currentSong (newSong, oldSong) {
-      if (!this.showFlag || newSong.id === oldSong.id) {
-        return
-      }
-      this.scrollToCurrent(newSong)// 滚动到当前播放的歌曲位置
     }
+    this.setCurrentIndex(index)
+    this.setPlayingState(true)
+  }
+
+  public scrollToCurrent(current: Song) {
+    const index = this.sequencelist.findIndex((song) => {
+      return song.id === current.id
+    })
+    this.$refs.listContent.scrollToElement(this.$refs.listItem[index], 300)
+  }
+
+  public deleteOne(item: Song) {
+    this.deleteSong(item)
+    // 删除歌曲之后，判断时候还有歌曲。没有就隐藏掉playlist，防止再次添加歌曲，player父组件的展示引起playlist的展示。
+    if (!this.playlist.length) {
+      this.hide()
+    }
+  }
+
+  @Watch('currentSong')
+  public onCurrentSongChange(newSong: Song, oldSong: Song) {
+    if (!this.showFlag || newSong.id === oldSong.id) {
+      return
+    }
+    this.scrollToCurrent(newSong)// 滚动到当前播放的歌曲位置
   }
 }
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
-  @import "~common/stylus/variable"
-  @import "~common/stylus/mixin"
+  @import "~@/common/stylus/variable"
+  @import "~@/common/stylus/mixin"
 
   .playlist
     position: fixed

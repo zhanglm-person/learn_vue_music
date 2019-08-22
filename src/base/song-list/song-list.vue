@@ -7,53 +7,52 @@
         </div>
         <div class="content">
           <h2 class="name">{{song.name}}</h2>
-          <p class="desc">{{song | getDesc}}</p>
+          <p class="desc">{{ song | getDesc }}</p>
         </div>
       </li>
     </ul>
   </div>
 </template>
 
-<script type='text/ecmascript-6'>
-export default {
-  props: {
-    songs: {
-      type: Array,
-      default: () => []
-    },
-    rank: {
-      type: Boolean,
-      default: false
-    }
-  },
-  methods: {
-    selectItem (item, index) {
-      this.$emit('select', item, index)
-    },
-    getRankCls (index) {
-      if (index <= 2) {
-        return `icon icon${index}`
-      } else {
-        return 'text'
-      }
-    },
-    getRankText (index) {
-      if (index > 2) {
-        return index + 1
-      }
-    }
-  },
+<script lang="ts">
+import { Vue, Component, Prop, Emit } from 'vue-property-decorator'
+import Song from '@/common/js/song'
+
+@Component({
   filters: {
-    getDesc (song) {
+    getDesc(song: Song): string {
       return `${song.singer}·${song.album}`
+    },
+  },
+})
+export default class SongList extends Vue {
+  @Prop({ default: () => [], type: Array}) public songs!: Song[]
+  @Prop({ default: false, type: Boolean}) public rank!: boolean
+
+  @Emit('select')
+  public selectItem(item: Song, index: number) {
+    //
+  }
+
+  public getRankCls(index: number) {
+    if (index <= 2) {
+      return `icon icon${index}`
+    } else {
+      return 'text'
+    }
+  }
+
+  public getRankText(index: number) {
+    if (index > 2) {
+      return index + 1
     }
   }
 }
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" scoped>
-  @import "~common/stylus/variable"
-  @import "~common/stylus/mixin"
+  @import "~@/common/stylus/variable"
+  @import "~@/common/stylus/mixin"
 
   .song-list
     .item

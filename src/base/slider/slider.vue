@@ -14,116 +14,138 @@
   </div>
 </template>
 
-<script type="text/ecmascript-6">
+<script lang="ts">
+import { Component, Vue, Prop } from 'vue-property-decorator'
 import BScroll from 'better-scroll'
-import { addClass } from 'common/js/dom'
+import { addClass } from '@/common/js/dom'
 
-export default {
+@Component({
   name: 'slider',
-  props: {
-    loop: {
-      type: Boolean,
-      default: true
-    },
-    autoPlay: {
-      type: Boolean,
-      default: true
-    },
-    interval: {
-      type: Number,
-      default: 2000
-    }
-  },
-  data () {
-    return {
-      dots: [],
-      currentPageIndex: 0
-    }
-  },
-  mounted () {
+})
+export default class Slider extends Vue {
+  @Prop({ default: true, type: Boolean }) public readonly loop!: boolean
+  @Prop({ default: true, type: Boolean }) public readonly autoPlay!: boolean
+  @Prop({ default: 2000, type: Number }) public readonly interval!: number
+
+  public dots: number[] = []
+  public currentPageIndex: number = 0
+  public timer!: number
+  public resizeTimer!: number
+  public slider!: BScroll
+  public children!: [HTMLElement]
+
+  public $refs!: {
+    sliderGroup: HTMLElement
+    slider: HTMLElement,
+  }
+
+  public mounted() {
     // 外部要确定获取到数据再进行此操作
-    // 不用this.$nextTick(),因为浏览器的刷新时间是17ms
     setTimeout(() => {
-      this._setSliderWidth()
-      this._initDots()
-      this._initSlider()
+      this.setSliderWidth()
+      this.initDots()
+      this.initSlider()
 
       if (this.autoPlay) {
-        this._play()
+        this.play()
       }
     }, 20)
     window.addEventListener('resize', () => {
-      if (!this.slider) {
+      if (!this.slider || !this.slider.enabled) {
         return
       }
-      this._setSliderWidth(true) // 如果是resize，就不能再次设置宽度的时候加上2个子元素的宽
-      this.slider.refresh()
+
+      clearTimeout(this.resizeTimer)
+
+      this.resizeTimer = setTimeout(() => {
+        if (this.slider.isInTransition) {
+          this.getCurrentPageIndex()
+        } else {
+          if (this.autoPlay) {
+            this.play()
+          }
+        }
+        this.refresh()
+      }, 60)
     })
-  },
-  methods: {
-    _setSliderWidth (isResize) {
-      // 获取slider的图片数量
-      this.children = this.$refs.sliderGroup.children
-      let width = 0
-      // 每一个图片的宽度就是最外层视口容器的宽度
-      let sliderWidth = this.$refs.slider.clientWidth
-      for (let i = 0; i < this.children.length; i++) {
-        let child = this.children[i]
+  }
 
-        addClass(child, 'slider-item')
-        child.style.width = sliderWidth + 'px'
-        width += sliderWidth
-      }
-      // 如果是循环播放，会复制2个子元素，保证循环正确性，所以要给父元素加上2个单位元素的宽度，但是如果是resize的时候，已经添加过了子元素就不能重复添加了。
-      if (this.loop && !isResize) {
-        width += 2 * sliderWidth
-      }
-      this.$refs.sliderGroup.style.width = width + 'px'
-    },
-    _initDots () {
-      this.dots = new Array(this.children.length)
-    },
-    _initSlider () {
-      this.slider = new BScroll(this.$refs.slider, {
-        scrollX: true,
-        scrollY: false,
-        snap: {
-          loop: this.loop,
-          threshold: 0.3,
-          speed: 400
-        },
-        momentum: false // 惯性
-        // click: true
-      })
-
-      this.slider.on('scrollEnd', this._getCurrentPageIndex)
-    },
-    // 获取当前轮播图页面索引
-    _getCurrentPageIndex () {
-      // 获取到的当前轮播到第几个图片，getCurrentPage是BScroll的自带Api
-      let pageIndex = this.slider.getCurrentPage().pageX
-      // 设置currentPageIndex
-      this.currentPageIndex = pageIndex
-      if (this.autoPlay) {
-        this._play()
-      }
-    },
-    _play () {
-      clearTimeout(this.timer)
-      this.timer = setTimeout(() => {
-        this.slider.next()
-      }, this.interval)
+  public refresh() {
+    if (this.slider) {
+      this.setSliderWidth(true)
+      this.slider.refresh()
     }
-  },
-  destroyed () {
-    // 切换路由最后会执行销毁hook，清理计时器，防止占用内存
+  }
+
+  public deactivated() {
+    this.slider.disable()
     clearTimeout(this.timer)
+  }
+
+  public beforeDestroy() {
+    this.slider.disable()
+    clearTimeout(this.timer)
+  }
+
+  private setSliderWidth(isResize?: boolean) {
+    // 获取slider的图片数量
+    this.children = this.$refs.sliderGroup.children as any
+    let width = 0
+    // 每一个图片的宽度就是最外层视口容器的宽度
+    const sliderWidth = this.$refs.slider.clientWidth
+    for (const child of this.children) {
+      addClass(child, 'slider-item')
+      child.style.width = sliderWidth + 'px'
+      width += sliderWidth
+    }
+
+    // 如果是循环播放，会复制2个子元素，保证循环正确性，所以要给父元素加上2个单位元素的宽度，但是如果是resize的时候，已经添加过了子元素就不能重复添加了。
+    if (this.loop && !isResize) {
+      width += 2 * sliderWidth
+    }
+    this.$refs.sliderGroup.style.width = width + 'px'
+  }
+
+  private initDots() {
+    this.dots = new Array(this.children.length)
+  }
+
+  private initSlider() {
+    this.slider = new BScroll(this.$refs.slider, {
+      scrollX: true,
+      scrollY: false,
+      snap: {
+        loop: this.loop,
+        threshold: 0.3,
+        speed: 400,
+      },
+      momentum: false, // 惯性
+      // click: true
+    })
+    this.slider.on('scrollEnd', this.getCurrentPageIndex)
+  }
+
+  private getCurrentPageIndex() {
+    // 获取到的当前轮播到第几个图片，getCurrentPage是BScroll的自带Api
+    const pageIndex = this.slider.getCurrentPage().pageX
+    // 设置currentPageIndex
+    this.currentPageIndex = pageIndex
+    if (this.autoPlay) {
+      this.play()
+    }
+  }
+
+  private play() {
+    clearTimeout(this.timer)
+    this.timer = setTimeout(() => {
+      this.slider.next()
+    }, this.interval)
   }
 }
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">
-  @import "~common/stylus/variable"
+  @import "~@/common/stylus/variable"
 
   .slider
     min-height: 1px
